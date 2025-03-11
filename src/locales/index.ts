@@ -4,7 +4,7 @@ import en from './en.ts';
 
 const messages = {
   en,
-//   es,
+//es,
 };
 
 const i18n = createI18n({

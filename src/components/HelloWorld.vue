@@ -10,12 +10,11 @@ defineProps<{ msg: string }>()
 
 <template>
   <h1>{{ msg }}</h1>
-
-  <div class="card">
-    <Button label="button" />
-    <p>
-      {{ t('welcome') }}
+  <p>
+      {{ t('login') }}
     </p>
+  <div class="w-full flex flex-col gap-2 card">
   </div>
+  <Button :label="t('login')" icon="pi pi-home" aria-label="Save" />
 </template>
 
