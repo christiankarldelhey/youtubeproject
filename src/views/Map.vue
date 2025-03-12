@@ -4,6 +4,7 @@
   import { useMap } from '../composables/useMap';
   import SearchBar from '../components/SearchBar.vue';
   import { useYoutube } from '../composables/useYouTube';
+  import { Button } from '@/components/ui/button'
 
     const { initializeLeaflet } = useMap();
     initializeLeaflet();
@@ -15,7 +16,7 @@
 
 <template>
   <div class="relative w-full h-screen">
-    <Button label="Fetch Videos" icon="pi pi-check" iconPos="right" @click="fetchYoutubeVideos({ apiKey })" />
+    <Button @click="fetchYoutubeVideos({ apiKey })">Fetch Videos</Button>
     <SearchBar />
     <l-map 
       ref="map" 

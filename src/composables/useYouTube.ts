@@ -36,9 +36,9 @@ export function useYoutube() {
   const error = ref<Error | null>(null);
 
   const fetchYoutubeVideos = async ({
-    latitude = 42.125,
-    longitude = 9.386,
-    radius = '25000m',
+    latitude = 41.581,
+    longitude = 2.154,
+    radius = '5000m',
     maxResults = 20,
     apiKey,
   }: FetchYoutubeParams): Promise<void> => {
