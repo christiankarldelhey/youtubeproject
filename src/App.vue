@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import MapView from './views/Map.vue'
 </script>
 
 <template>
-  <HelloWorld msg="Vite + Vue" />
+  <MapView />
 </template>
-
-
