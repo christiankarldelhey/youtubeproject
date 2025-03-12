@@ -11,15 +11,41 @@ interface VideoSnippet {
   };
 }
 
+interface RecordingDetails {
+  recordingDate?: string;
+  location?: {
+    latitude: number;
+    longitude: number;
+    altitude: number;
+  };
+}
+
 interface VideoItem {
   id: {
     videoId: string;
   };
   snippet: VideoSnippet;
+  recordingDetails?: RecordingDetails;
+  topicDetails?: {
+    topicCategories: string[];
+  };
+}
+
+interface DetailedVideoItem {
+  id: string;
+  snippet: VideoSnippet;
+  recordingDetails: RecordingDetails;
+  topicDetails: {
+    topicCategories: string[];
+  };
 }
 
 interface YoutubeApiResponse {
   items: VideoItem[];
+}
+
+interface YoutubeDetailedApiResponse {
+  items: DetailedVideoItem[];
 }
 
 interface FetchYoutubeParams {
@@ -35,10 +61,29 @@ export function useYoutube() {
   const loading = ref(false);
   const error = ref<Error | null>(null);
 
+  const fetchVideoDetails = async (videoIds: string[], apiKey: string): Promise<DetailedVideoItem[]> => {
+    const endpoint = 'https://youtube.googleapis.com/youtube/v3/videos';
+    const params = {
+      part: 'snippet,recordingDetails,topicDetails',
+      id: videoIds.join(','),
+      key: apiKey
+    };
+
+    try {
+      const { data } = await axios.get<YoutubeDetailedApiResponse>(endpoint, { params });
+      return data.items;
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        throw err;
+      }
+      throw new Error('An unexpected error occurred fetching video details.');
+    }
+  };
+
   const fetchYoutubeVideos = async ({
-    latitude = 41.581,
-    longitude = 2.154,
-    radius = '5000m',
+    latitude = -22.447772,
+    longitude = -65.934821,
+    radius = '15000m',
     maxResults = 20,
     apiKey,
   }: FetchYoutubeParams): Promise<void> => {
@@ -56,12 +101,23 @@ export function useYoutube() {
       locationRadius: radius,
       order: 'viewCount',
       videoCategoryId: 19,
-      videoDuration: 'long',
+      videoDuration: 'any',
     };
 
     try {
       const { data } = await axios.get<YoutubeApiResponse>(endpoint, { params });
-      videos.value = data.items;
+      const videoIds = data.items.map(item => item.id.videoId);
+
+      const detailedVideos = await fetchVideoDetails(videoIds, apiKey);
+      
+      videos.value = data.items.map(item => {
+        const detailedVideo = detailedVideos.find(v => v.id === item.id.videoId);
+        return {
+          ...item,
+          recordingDetails: detailedVideo?.recordingDetails,
+          topicDetails: detailedVideo?.topicDetails
+        };
+      });
     } catch (err) {
       if (axios.isAxiosError(err)) {
         error.value = err;
