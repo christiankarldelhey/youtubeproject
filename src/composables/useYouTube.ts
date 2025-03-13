@@ -7,8 +7,6 @@ export function useYoutube() {
   const loading = ref(false);
   const error = ref<Error | null>(null);
 
-
-
   const fetchVideoDetails = async (videoIds: string[], apiKey: string): Promise<DetailedVideoItem[]> => {
     const endpoint = 'https://youtube.googleapis.com/youtube/v3/videos';
     const params = {
@@ -45,16 +43,15 @@ export function useYoutube() {
       part: 'snippet',
       relevanceLanguage: 'es',
       maxResults,
+      q: 'travel',
       type: 'video',
       key: apiKey,
       location: currentMapPosition ? `${currentMapPosition[0]},${currentMapPosition[1]}` : '0,0',
       locationRadius: currentRadius,
-      order: 'relevance',
-      videoCategoryId: 19,
+      order: 'viewCount',
+      // videoCategoryId: 19,
       videoDuration: 'any',
     };
-
-    console.log(params);
 
     try {
       const { data } = await axios.get<YoutubeApiResponse>(endpoint, { params });

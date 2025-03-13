@@ -4,15 +4,15 @@
   import WorldMap from '../components/WorldMap.vue';
   import { useYoutube } from '../composables/useYouTube';
   import AppSidebar from '@/components/AppSidebar.vue'
-  import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+  import { SidebarProvider } from '@/components/ui/sidebar'
 
   const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
   const { videos, loading, error, fetchYoutubeVideos } = useYoutube();
-  const currentMapPosition = ref([47.41322, -1.219482]);
+  const currentMapPosition = ref<[number, number]>([47.41322, -1.219482]);
   const currentRadius = ref('1000km');
 
-  const handleMapCenterChanged = (position: number[], zoom: number) => {
-    currentMapPosition.value = [position[0], position[1]];
+  const handleMapCenterChanged = (position: [number, number], zoom: number) => {
+    currentMapPosition.value = position;
     currentRadius.value = calculateRadiusFromZoom(zoom);
     console.log('new radius: ', currentRadius.value);
   };
@@ -23,14 +23,22 @@
     return `${limitedRadius}km`;
   };
 
+  const handleLocationSearch = (location: [number, number]) => {
+    currentMapPosition.value = location;
+    fetchYoutubeVideos({ apiKey, currentMapPosition: location, currentRadius: currentRadius.value });
+  };
 </script>
 
 <template>
   <SidebarProvider>
     <AppSidebar @fetch-videos="fetchYoutubeVideos({ apiKey, currentMapPosition, currentRadius })" />
     <div class="flex flex-col w-full">
-      <SearchBar @search-videos="" />
-      <WorldMap :videos="videos" @map-center-changed="handleMapCenterChanged" />
+      <SearchBar @search-videos="handleLocationSearch" />
+      <WorldMap 
+        :videos="videos" 
+        :center="currentMapPosition"
+        @map-center-changed="handleMapCenterChanged" 
+      />
     </div>
   </SidebarProvider>
 </template>
