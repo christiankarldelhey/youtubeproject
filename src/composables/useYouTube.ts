@@ -43,12 +43,13 @@ export function useYoutube() {
 
     const params = {
       part: 'snippet',
+      relevanceLanguage: 'es',
       maxResults,
       type: 'video',
       key: apiKey,
       location: currentMapPosition ? `${currentMapPosition[0]},${currentMapPosition[1]}` : '0,0',
       locationRadius: currentRadius,
-      order: 'viewCount',
+      order: 'relevance',
       videoCategoryId: 19,
       videoDuration: 'any',
     };

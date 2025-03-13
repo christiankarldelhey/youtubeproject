@@ -27,9 +27,9 @@
 
 <template>
   <SidebarProvider>
-    <AppSidebar />
+    <AppSidebar @fetch-videos="fetchYoutubeVideos({ apiKey, currentMapPosition, currentRadius })" />
     <div class="flex flex-col w-full">
-      <SearchBar @fetch-videos="fetchYoutubeVideos({ apiKey, currentMapPosition, currentRadius })" />
+      <SearchBar @search-videos="" />
       <WorldMap :videos="videos" @map-center-changed="handleMapCenterChanged" />
     </div>
   </SidebarProvider>

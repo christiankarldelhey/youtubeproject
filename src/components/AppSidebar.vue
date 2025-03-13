@@ -11,11 +11,14 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
+const emit = defineEmits(['fetch-videos']);
+
 const items = [
   {
     title: "Home",
     url: "#",
     icon: Home,
+    onClick: () => { emit('fetch-videos')}
   },
   {
     title: "Inbox",
@@ -38,6 +41,13 @@ const items = [
     icon: Settings,
   },
 ];
+
+const handleItemClick = (item: any, event: Event) => {
+  if (item.onClick) {
+    event.preventDefault();
+    item.onClick();
+  }
+};
 </script>
 
 <template>
@@ -49,7 +59,7 @@ const items = [
           <SidebarMenu>
               <SidebarMenuItem v-for="item in items" :key="item.title">
                 <SidebarMenuButton asChild>
-                    <a :href="item.url">
+                    <a :href="item.url" @click="(e) => handleItemClick(item, e)">
                       <component :is="item.icon" />
                       <span>{{item.title}}</span>
                     </a>
