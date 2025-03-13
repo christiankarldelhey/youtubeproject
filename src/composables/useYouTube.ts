@@ -1,65 +1,13 @@
 import { ref } from 'vue';
 import axios from 'axios';
-
-interface VideoSnippet {
-  title: string;
-  description: string;
-  thumbnails: {
-    default: { url: string };
-    medium: { url: string };
-    high: { url: string };
-  };
-}
-
-interface RecordingDetails {
-  recordingDate?: string;
-  location?: {
-    latitude: number;
-    longitude: number;
-    altitude: number;
-  };
-}
-
-interface VideoItem {
-  id: {
-    videoId: string;
-  };
-  snippet: VideoSnippet;
-  recordingDetails?: RecordingDetails;
-  topicDetails?: {
-    topicCategories: string[];
-  };
-}
-
-interface DetailedVideoItem {
-  id: string;
-  snippet: VideoSnippet;
-  recordingDetails: RecordingDetails;
-  topicDetails: {
-    topicCategories: string[];
-  };
-}
-
-interface YoutubeApiResponse {
-  items: VideoItem[];
-}
-
-interface YoutubeDetailedApiResponse {
-  items: DetailedVideoItem[];
-}
-
-interface FetchYoutubeParams {
-  latitude?: number;
-  longitude?: number;
-  radius?: string;
-  maxResults?: number;
-  apiKey: string;
-}
+import type { VideoItem, DetailedVideoItem, YoutubeApiResponse, YoutubeDetailedApiResponse, FetchYoutubeParams } from '../types/Map';
 
 export function useYoutube() {
   const videos = ref<VideoItem[]>([]);
   const loading = ref(false);
   const error = ref<Error | null>(null);
+
+
 
   const fetchVideoDetails = async (videoIds: string[], apiKey: string): Promise<DetailedVideoItem[]> => {
     const endpoint = 'https://youtube.googleapis.com/youtube/v3/videos';
@@ -81,14 +29,15 @@ export function useYoutube() {
   };
 
   const fetchYoutubeVideos = async ({
-    latitude = -22.447772,
-    longitude = -65.934821,
-    radius = '15000m',
-    maxResults = 20,
+    maxResults = 50,
     apiKey,
+    currentMapPosition,
+    currentRadius,
   }: FetchYoutubeParams): Promise<void> => {
     loading.value = true;
     error.value = null;
+
+    console.log(currentMapPosition);
 
     const endpoint = `https://youtube.googleapis.com/youtube/v3/search`;
 
@@ -97,12 +46,14 @@ export function useYoutube() {
       maxResults,
       type: 'video',
       key: apiKey,
-      location: `${latitude},${longitude}`,
-      locationRadius: radius,
+      location: currentMapPosition ? `${currentMapPosition[0]},${currentMapPosition[1]}` : '0,0',
+      locationRadius: currentRadius,
       order: 'viewCount',
       videoCategoryId: 19,
       videoDuration: 'any',
     };
+
+    console.log(params);
 
     try {
       const { data } = await axios.get<YoutubeApiResponse>(endpoint, { params });
@@ -111,13 +62,14 @@ export function useYoutube() {
       const detailedVideos = await fetchVideoDetails(videoIds, apiKey);
       
       videos.value = data.items.map(item => {
-        const detailedVideo = detailedVideos.find(v => v.id === item.id.videoId);
+        const detailedVideo = detailedVideos.find(video => video.id === item.id.videoId);
         return {
           ...item,
           recordingDetails: detailedVideo?.recordingDetails,
           topicDetails: detailedVideo?.topicDetails
         };
       });
+
     } catch (err) {
       if (axios.isAxiosError(err)) {
         error.value = err;
