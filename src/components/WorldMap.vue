@@ -1,11 +1,17 @@
 <script setup lang="ts">
+  import L from 'leaflet';
   import { LMap, LTileLayer, LMarker, LPopup } from "@vue-leaflet/vue-leaflet";
-  import { ref, computed } from 'vue';
+  import 'leaflet.markercluster';
+  import { LMarkerClusterGroup } from 'vue-leaflet-markercluster'
+  import { ref, computed, watch } from 'vue';
   import { useMap } from '../composables/useMap';
-  import type { VideoItem } from '../types/Map';
+  import type { VideoItem, VideoMarker } from '../types/Map';
+
+  window.L = L;
 
   const props = defineProps<{
-    videos: VideoItem[]
+    videos: VideoItem[],
+    currentBox?: [number, number, number, number]
   }>();
 
   const emit = defineEmits(['map-center-changed']);
@@ -16,12 +22,6 @@
   const zoom = ref(2);
   const mapRef = ref();
   const center = ref<[number, number]>([47.41322, -1.219482]);
-
-  interface VideoMarker {
-    position: [number, number];
-    title: string;
-    videoId: string;
-  }
 
   const videoMarkers = computed<VideoMarker[]>(() => {
     return props.videos
@@ -50,6 +50,28 @@
   const onMapReady = () => {
     console.log('map ready');
   };
+
+//   watch([() => props.currentBox, videoMarkers], ([bbox, markers]) => {
+//   if (mapRef.value?.leafletObject) {
+//     const map = mapRef.value.leafletObject;
+
+//     if (bbox) {
+//       // If bbox is provided, fit the map to the bounding box
+//       const bounds = L.latLngBounds(
+//         [bbox[0], bbox[1]], // Southwest
+//         [bbox[2], bbox[3]]  // Northeast
+//       );
+//       map.fitBounds(bounds);
+//     } else if (markers.length > 0) {
+//       // If no bbox but markers exist, fit the map to marker bounds
+//       const markerBounds = L.latLngBounds(markers.map(marker => marker.position));
+//       map.fitBounds(markerBounds);
+//     } else {
+//       // Fallback to a default view
+//       map.setView(center.value, zoom.value);
+//     }
+//   }
+// });
 </script>
 
 <template>
@@ -64,7 +86,8 @@
       layer-type="base"
       name="Stadiamaps"
     ></l-tile-layer>
-    <l-marker 
+    <l-marker-cluster-group>
+      <l-marker 
       v-for="marker in videoMarkers"
       :key="marker.videoId"
       :lat-lng="marker.position">
@@ -72,6 +95,7 @@
         <a :href="`https://www.youtube.com/watch?v=${marker.videoId}`" target="_blank">{{ marker.title }}</a>
       </l-popup>
     </l-marker>
+    </l-marker-cluster-group>
   </l-map>
 </template>
 

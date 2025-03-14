@@ -50,7 +50,7 @@ export function useYoutube() {
       locationRadius: currentRadius,
       order: 'viewCount',
       // videoCategoryId: 19,
-      videoDuration: 'any',
+      videoDuration: 'long',
     };
 
     try {

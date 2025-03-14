@@ -54,3 +54,10 @@ export interface VideoSnippet {
     currentMapPosition?: number[];
     currentRadius?: string;
   }
+
+  export interface VideoMarker {
+    position: [number, number];
+    title: string;
+    videoId: string;
+    thumbnail?: string;
+  }

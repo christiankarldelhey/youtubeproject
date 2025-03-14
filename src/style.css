@@ -1,5 +1,5 @@
 @import "leaflet/dist/leaflet.css";
-
+@import "vue-leaflet-markercluster/dist/style.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
