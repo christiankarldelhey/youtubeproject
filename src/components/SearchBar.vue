@@ -10,10 +10,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import type { center, bbox } from '../types/Map';
+import { useMapStore } from '../store/mapStore';
 
-const emit = defineEmits(['goToLocation', 'fetch-videos']);
+const mapStore = useMapStore();
+const emit = defineEmits(['fetch-videos']);
+
 const { autocompleteSearchLocation, currentLocation, loading } = useSearchLocation();
-
 const term = ref('');
 const isPopoverOpen = ref(false);
 
@@ -25,11 +28,17 @@ const handleAutocomplete = async () => {
   isPopoverOpen.value = results && results.length > 0;
 };
 
-const closeAndGoToLocation = (coordinates: [number, number], bbox?: [number, number, number, number]) => {
+const closeAndGoToLocation = (coordinates: center, bbox?: bbox) => {
   term.value = '';
   autocompleteResults.value = null;
   isPopoverOpen.value = false;
-  emit('goToLocation', { coordinates, bbox });
+  console.log('Received coordinates:', coordinates);
+   // Assuming API gives [lng, lat]
+   const [lng, lat] = coordinates;
+   // Leaflet expects [lat, lng]
+   mapStore.setCenter([lat, lng]);
+   //mapStore.setCenter([coordinates[1], coordinates[0]]);
+  if (bbox) mapStore.setBBox(bbox);
 };
 
 watch(term, (newVal) => {
@@ -72,7 +81,7 @@ watch(term, (newVal) => {
         <div>
           <ul>
             <li 
-              @click="closeAndGoToLocation([result.properties.lat, result.properties.lon], result.bbox)"
+              @click="closeAndGoToLocation(result.geometry.coordinates, result.bbox)"
               v-for="result in autocompleteResults"
               class="p-2 hover:bg-gray-100 cursor-pointer rounded">
               {{ result.properties.address_line1 }}, 

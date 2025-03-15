@@ -2,8 +2,11 @@
 import { ref, computed } from 'vue';
 import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import type { VideoItem, VideoMarker } from "../types/Map";
+import type { VideoItem, VideoMarker, center, zoom } from "../types/Map";
 import { removeEmojis } from '@/utils/utils.ts';
+import { useMapStore } from '../store/mapStore';
+
+const mapStore = useMapStore();
 
 const props = defineProps<{ videos: VideoItem[] }>();
 const emit = defineEmits(['goToLocation']);
@@ -37,15 +40,18 @@ const groupedVideoMarkers = computed(() => {
     }
   });
 
-  // Sort locations by frequency (descending)
   return Object.entries(locationMap)
     .sort(([, a], [, b]) => b.length - a.length)
     .map(([location, videos]) => ({ location, videos }));
 });
 
-// Toggle collapse state
 const toggleCollapse = (location: string) => {
   collapsedLocations.value[location] = !collapsedLocations.value[location];
+};
+
+const goToLocation = (coordinates: center, zoom: zoom) => {
+  mapStore.setCenter(coordinates);
+  mapStore.setZoom(zoom);
 };
 </script>
 
@@ -67,7 +73,7 @@ const toggleCollapse = (location: string) => {
             <Card 
               v-for="video in group.videos" 
               :key="video.videoId"
-              @mouseover="emit('goToLocation', { coordinates: video.position, zoom: 12 })"
+              @mouseover="goToLocation(video.position, 12)"
               class="cursor-pointer mx-4 my-2 bg-stone-800 border-stone-800 text-gray-400">
               
               <CardHeader>

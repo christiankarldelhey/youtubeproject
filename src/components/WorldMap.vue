@@ -6,8 +6,15 @@
   import { ref, computed, watch } from 'vue';
   import { useMap } from '../composables/useMap';
   import type { VideoItem, VideoMarker } from '../types/Map';
+  import { useMapStore } from '../store/mapStore';
 
   window.L = L;
+
+  const props = defineProps<{
+    videos: VideoItem[],
+  }>();
+
+  const mapStore = useMapStore();
 
   const mapOptions = {
     stadia: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
@@ -17,20 +24,10 @@
     google: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
   }
 
-  const props = defineProps<{
-    videos: VideoItem[],
-    currentBox?: [number, number, number, number],
-    currentZoom?: number
-  }>();
-
-  const emit = defineEmits(['map-center-changed']);
-
   const { initializeLeaflet } = useMap();
   initializeLeaflet();
 
-  const zoom = ref(2);
   const mapRef = ref();
-  const center = ref<[number, number]>([47.41322, -1.219482]);
 
   const videoMarkers = computed<VideoMarker[]>(() => {
     return props.videos
@@ -51,11 +48,12 @@
       }));
   });
 
-  const getMapCenter = () => {
+  const moveMapCenter = () => {
+    console.log('move map center');
     if (mapRef.value?.leafletObject) {
       const mapCenter = mapRef.value.leafletObject.getCenter();
-      center.value = [mapCenter.lat, mapCenter.lng];
-      emit('map-center-changed', center.value, zoom.value);
+      mapStore.setCenter([mapCenter.lat, mapCenter.lng]);
+      mapStore.setZoom(mapRef.value.leafletObject.getZoom());
     }
   };
 
@@ -63,19 +61,12 @@
     console.log('map ready');
   };
 
-  watch(() => props.currentBox, (bbox) => {
-  if (mapRef.value?.leafletObject) {
-    const map = mapRef.value.leafletObject;
-
-    if (bbox) {
-      const bounds = L.latLngBounds(
-        [bbox[0], bbox[1]],
-        [bbox[2], bbox[3]] 
-      );
-      map.fitBounds(bounds);
-    } else {
-      map.flyTo(center.value, zoom.value);
-    }
+watch(() => mapStore.bbox, (bbox) => {
+  if (mapRef.value?.leafletObject && bbox) {
+    mapRef.value.leafletObject.fitBounds(L.latLngBounds(
+      [bbox[0], bbox[1]],
+      [bbox[2], bbox[3]]
+    ));
   }
 });
 
@@ -84,9 +75,9 @@
 <template>
   <l-map 
     ref="mapRef" 
-    v-model:zoom="zoom" 
-    :center="center"
-    @moveend="getMapCenter"
+    v-model:zoom="mapStore.zoom" 
+    :center="mapStore.center"
+    @moveend="moveMapCenter"
     @ready="onMapReady">
     <l-tile-layer
       :url="mapOptions.stadia"

@@ -1,3 +1,8 @@
+export type zoom = number;
+export type center = [number, number];
+export type selectedPin = string | null;
+export type bbox = [number, number, number, number] | null;
+
 export interface VideoSnippet {
     title: string;
     description: string;
@@ -50,6 +55,13 @@ export interface VideoSnippet {
     coordinates: [number, number];
     bbox?: [number, number, number, number];
     zoom?: number;
+  };
+
+  export type MapStoreState = { 
+    zoom: zoom;
+    center: center;
+    bbox: bbox;
+    selectedPin: selectedPin;
   };
   
   export interface FetchYoutubeParams {
