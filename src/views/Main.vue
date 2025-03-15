@@ -5,45 +5,47 @@
   import { useYoutube } from '../composables/useYouTube';
   import AppSidebar from '@/components/AppSidebar.vue'
   import { SidebarProvider } from '@/components/ui/sidebar'
+  import type { GoToLocationOptions } from '../types/Map';
 
   const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
   const { videos, loading, error, fetchYoutubeVideos } = useYoutube();
   const currentMapPosition = ref<[number, number]>([47.41322, -1.219482]);
-  const currentRadius = ref('1000km');
+  const currentZoom = ref(2);
   const currentBbox = ref<[number, number, number, number]>([47.41322, -1.219482, 47.41322, -1.219482]);
 
   const handleMapCenterChanged = (position: [number, number], zoom: number) => {
+    console.log('map change', 'new zoom', zoom);
     currentMapPosition.value = position;
-    currentRadius.value = calculateRadiusFromZoom(zoom);
-    console.log('new radius: ', currentRadius.value);
+    currentZoom.value = zoom;
   };
 
-  const goToLocation = (coordinates: [number, number], bbox?: [number, number, number, number]) => {
-    currentMapPosition.value = coordinates;
-    currentBbox.value = bbox || currentBbox.value;
-  };
+  const goToLocation = ({ coordinates, bbox, zoom }: GoToLocationOptions) => {
+  console.log('go to location', coordinates, bbox, zoom)
+  if (bbox) {
+    console.log('Fitting to bounding box:', bbox);
+    currentBbox.value = bbox;
+  }
+  if (zoom) {
+    console.log('Zooming to level:', zoom);
+    currentZoom.value = zoom;
+  }
+  currentMapPosition.value = coordinates;
+};
 
-  const calculateRadiusFromZoom = (zoomLevel: number): string => {
-    const radiusKm = 40075 / Math.pow(2, zoomLevel); 
-    const limitedRadius = Math.min(Math.ceil(radiusKm), 1000);
-    return `${limitedRadius}km`;
-  };
-
-  const handleLocationSearch = (location: [number, number]) => {
-    currentMapPosition.value = location;
-    fetchYoutubeVideos({ apiKey, currentMapPosition: location, currentRadius: currentRadius.value });
-  };
 </script>
 
 <template>
-  <SidebarProvider>
-    <AppSidebar @fetch-videos="fetchYoutubeVideos({ apiKey, currentMapPosition, currentRadius })" />
+  <SidebarProvider class="border-stone-700" style="--sidebar-width: 23rem;">
+    <AppSidebar 
+      @go-to-location="goToLocation"
+      :videos="videos" />
     <div class="flex flex-col w-full">
       <SearchBar 
-        @search-videos="handleLocationSearch" 
+        @fetch-videos="fetchYoutubeVideos({ apiKey, currentMapPosition, currentZoom })"
         @go-to-location="goToLocation" />
       <WorldMap 
         :videos="videos" 
+        :current-zoom="currentZoom"
         :current-box="currentBbox"
         :center="currentMapPosition"
         @map-center-changed="handleMapCenterChanged" 

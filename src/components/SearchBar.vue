@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { Input } from '@/components/ui/input';
+import { Button }from '@/components/ui/button';
 import { Search } from 'lucide-vue-next';
 import { useSearchLocation } from '../composables/useSearchLocation';
 import type { GeoFeature } from '../composables/useSearchLocation';
@@ -10,7 +11,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 
-const emit = defineEmits(['search-videos', 'goToLocation']);
+const emit = defineEmits(['goToLocation', 'fetch-videos']);
 const { autocompleteSearchLocation, currentLocation, loading } = useSearchLocation();
 
 const term = ref('');
@@ -28,7 +29,7 @@ const closeAndGoToLocation = (coordinates: [number, number], bbox?: [number, num
   term.value = '';
   autocompleteResults.value = null;
   isPopoverOpen.value = false;
-  emit('goToLocation', coordinates, bbox);
+  emit('goToLocation', { coordinates, bbox });
 };
 
 watch(term, (newVal) => {
@@ -42,7 +43,7 @@ watch(term, (newVal) => {
 <template>
   <Popover v-model:open="isPopoverOpen">
     <div
-    class="fixed top-2 left-80 flex items-center bg-white rounded shadow-lg z-9999">
+    class="fixed top-2 left-96 flex items-center bg-white rounded shadow-lg z-9999">
         <div class="relative w-full">
         <PopoverTrigger as-child>
           <Input 
@@ -59,6 +60,11 @@ watch(term, (newVal) => {
           <span class="absolute left-3 top-1/2 -translate-y-1/2">
             <Search class="h-4 w-4 text-muted-foreground" />
           </span>
+         <Button 
+            @click="emit('fetch-videos')" 
+            class="absolute left-80 top-1/2 -translate-y-1/2">
+            Search videos here
+          </Button>
         </div>
       <PopoverContent 
         v-if="autocompleteResults && autocompleteResults.length > 0" 
@@ -66,7 +72,7 @@ watch(term, (newVal) => {
         <div>
           <ul>
             <li 
-              @click="closeAndGoToLocation(result.geometry.coordinates, result.bbox)"
+              @click="closeAndGoToLocation([result.properties.lat, result.properties.lon], result.bbox)"
               v-for="result in autocompleteResults"
               class="p-2 hover:bg-gray-100 cursor-pointer rounded">
               {{ result.properties.address_line1 }}, 

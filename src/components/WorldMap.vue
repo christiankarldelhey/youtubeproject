@@ -9,9 +9,18 @@
 
   window.L = L;
 
+  const mapOptions = {
+    stadia: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
+    carto: 'https://{a-d}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+    openstreetmap: 'https://{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
+    esri: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    google: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+  }
+
   const props = defineProps<{
     videos: VideoItem[],
-    currentBox?: [number, number, number, number]
+    currentBox?: [number, number, number, number],
+    currentZoom?: number
   }>();
 
   const emit = defineEmits(['map-center-changed']);
@@ -34,8 +43,11 @@
           video.recordingDetails.location.latitude,
           video.recordingDetails.location.longitude
         ],
+        location: video.recordingDetails.locationDescription,
         title: video.snippet.title,
-        videoId: video.id.videoId
+        description: video.snippet.description,
+        videoId: video.id.videoId,
+        thumbnail: video.snippet.thumbnails.high.url
       }));
   });
 
@@ -51,27 +63,22 @@
     console.log('map ready');
   };
 
-//   watch([() => props.currentBox, videoMarkers], ([bbox, markers]) => {
-//   if (mapRef.value?.leafletObject) {
-//     const map = mapRef.value.leafletObject;
+  watch(() => props.currentBox, (bbox) => {
+  if (mapRef.value?.leafletObject) {
+    const map = mapRef.value.leafletObject;
 
-//     if (bbox) {
-//       // If bbox is provided, fit the map to the bounding box
-//       const bounds = L.latLngBounds(
-//         [bbox[0], bbox[1]], // Southwest
-//         [bbox[2], bbox[3]]  // Northeast
-//       );
-//       map.fitBounds(bounds);
-//     } else if (markers.length > 0) {
-//       // If no bbox but markers exist, fit the map to marker bounds
-//       const markerBounds = L.latLngBounds(markers.map(marker => marker.position));
-//       map.fitBounds(markerBounds);
-//     } else {
-//       // Fallback to a default view
-//       map.setView(center.value, zoom.value);
-//     }
-//   }
-// });
+    if (bbox) {
+      const bounds = L.latLngBounds(
+        [bbox[0], bbox[1]],
+        [bbox[2], bbox[3]] 
+      );
+      map.fitBounds(bounds);
+    } else {
+      map.flyTo(center.value, zoom.value);
+    }
+  }
+});
+
 </script>
 
 <template>
@@ -82,17 +89,28 @@
     @moveend="getMapCenter"
     @ready="onMapReady">
     <l-tile-layer
-      url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
+      :url="mapOptions.stadia"
       layer-type="base"
-      name="Stadiamaps"
+      name="map"
     ></l-tile-layer>
     <l-marker-cluster-group>
       <l-marker 
       v-for="marker in videoMarkers"
       :key="marker.videoId"
       :lat-lng="marker.position">
-      <l-popup> 
-        <a :href="`https://www.youtube.com/watch?v=${marker.videoId}`" target="_blank">{{ marker.title }}</a>
+      <l-popup class="flex justify-center"> 
+        <a 
+        :href="`https://www.youtube.com/watch?v=${marker.videoId}`" 
+        target="_blank">
+          <p class="text-gray-300">{{ marker.location?.toUpperCase() }}</p>
+          <div class="relative w-64 h-36 overflow-hidden rounded">
+            <img 
+            :src="marker.thumbnail" 
+            alt="Video Thumbnail"
+            class="w-full h-full object-cover" />
+        </div>
+        <p>{{ marker.title }}</p>
+      </a>
       </l-popup>
     </l-marker>
     </l-marker-cluster-group>

@@ -26,16 +26,24 @@ export function useYoutube() {
     }
   };
 
+  const calculateRadiusFromZoom = (zoomLevel: number): string => {
+    const radiusKm = 40075 / Math.pow(2, zoomLevel); 
+    const limitedRadius = Math.min(Math.ceil(radiusKm), 1000);
+    return `${limitedRadius}km`;
+  };
+
   const fetchYoutubeVideos = async ({
     maxResults = 50,
     apiKey,
     currentMapPosition,
-    currentRadius,
+    currentZoom,
   }: FetchYoutubeParams): Promise<void> => {
     loading.value = true;
     error.value = null;
 
-    console.log(currentMapPosition);
+    console.log('me llega este zoom: ', currentZoom);
+    const currentRadius = calculateRadiusFromZoom(currentZoom ?? 10) ?? '1000km';
+    console.log('el radio: ', currentRadius);
 
     const endpoint = `https://youtube.googleapis.com/youtube/v3/search`;
 
@@ -48,9 +56,9 @@ export function useYoutube() {
       key: apiKey,
       location: currentMapPosition ? `${currentMapPosition[0]},${currentMapPosition[1]}` : '0,0',
       locationRadius: currentRadius,
-      order: 'viewCount',
-      // videoCategoryId: 19,
-      videoDuration: 'long',
+      order: 'relevance',
+      videoCategoryId: 19,
+      videoDuration: 'medium',
     };
 
     try {

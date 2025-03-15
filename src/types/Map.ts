@@ -15,6 +15,7 @@ export interface VideoSnippet {
       longitude: number;
       altitude: number;
     };
+    locationDescription?: string;
   }
   
   export interface VideoItem {
@@ -44,6 +45,12 @@ export interface VideoSnippet {
   export interface YoutubeDetailedApiResponse {
     items: DetailedVideoItem[];
   }
+
+  export type GoToLocationOptions = {
+    coordinates: [number, number];
+    bbox?: [number, number, number, number];
+    zoom?: number;
+  };
   
   export interface FetchYoutubeParams {
     latitude?: number;
@@ -52,12 +59,14 @@ export interface VideoSnippet {
     maxResults?: number;
     apiKey: string;
     currentMapPosition?: number[];
-    currentRadius?: string;
+    currentZoom?: number;
   }
 
   export interface VideoMarker {
     position: [number, number];
     title: string;
     videoId: string;
+    location?: string;
+    description?: string;
     thumbnail?: string;
   }
