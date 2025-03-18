@@ -47,7 +47,7 @@ watch(term, (newVal) => {
 <template>
   <Popover v-model:open="isPopoverOpen">
     <div
-    class="fixed top-2 left-1/2 -translate-x-1/2 flex items-center bg-white rounded shadow-lg z-9999">
+    class="fixed top-4 right-0 -translate-x-1/2 flex items-center bg-white rounded shadow-lg z-9999">
         <div class="relative w-full">
         <PopoverTrigger as-child>
           <Input 

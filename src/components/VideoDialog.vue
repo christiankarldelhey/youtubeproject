@@ -22,6 +22,8 @@ const closeDialog = () => {
         @update:open="(isOpen) => { if (!isOpen) closeDialog(); }"
     >
         <DialogContent 
+            modal
+            @interact-outside="(e) => e.preventDefault()" 
             class="bg-white max-w-4xl p-6 shadow-lg rounded-lg"
             :style="{ backdropFilter: 'none' }"
         >

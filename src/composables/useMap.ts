@@ -4,15 +4,6 @@ import "leaflet/dist/leaflet.css";
 export function useMap() {
 
     window.L = L;
-    
-    const initializeLeaflet = () => {
-        delete (L.Icon.Default.prototype as any)._getIconUrl;
-        L.Icon.Default.mergeOptions({
-            iconRetinaUrl: new URL('leaflet/dist/images/marker-icon-2x.png', import.meta.url).href,
-            iconUrl: new URL('leaflet/dist/images/marker-icon.png', import.meta.url).href,
-            shadowUrl: new URL('leaflet/dist/images/marker-shadow.png', import.meta.url).href,
-        });
-    };
 
     const mapsList = {
         stadia: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
@@ -26,6 +17,15 @@ export function useMap() {
         watercolor: "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}{r}.jpg",
         stadia2: "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
     }
+    
+    const initializeLeaflet = () => {
+        delete (L.Icon.Default.prototype as any)._getIconUrl;
+        L.Icon.Default.mergeOptions({
+            iconRetinaUrl: new URL('leaflet/dist/images/marker-icon-2x.png', import.meta.url).href,
+            iconUrl: new URL('leaflet/dist/images/marker-icon.png', import.meta.url).href,
+            shadowUrl: new URL('leaflet/dist/images/marker-shadow.png', import.meta.url).href,
+        });
+    };
 
     const getUserLocation = (): Promise<{ latitude: number; longitude: number }> => {
         return new Promise((resolve, reject) => {

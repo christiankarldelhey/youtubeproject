@@ -117,7 +117,7 @@ onMounted(async () => {
   </l-map>
   <div v-else class="flex justify-center items-center bg-background w-full h-full">
     <div class="flex flex-col items-center">
-      <p class="text-base text-gray-400">Loading map...</p>
+      <p class="text-base text-primary">Loading map...</p>
       <Progress class="w-64" :model-value="33" />
     </div>
   </div>
