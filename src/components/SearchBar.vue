@@ -32,13 +32,8 @@ const closeAndGoToLocation = (coordinates: center, bbox?: bbox) => {
   term.value = '';
   autocompleteResults.value = null;
   isPopoverOpen.value = false;
-  console.log('Received coordinates:', coordinates);
-   // Assuming API gives [lng, lat]
-   const [lng, lat] = coordinates;
-   // Leaflet expects [lat, lng]
-   mapStore.setCenter([lat, lng]);
-   //mapStore.setCenter([coordinates[1], coordinates[0]]);
-  if (bbox) mapStore.setBBox(bbox);
+  const [lng, lat] = coordinates;
+  mapStore.triggerFlyTo([lat, lng], 12, bbox);
 };
 
 watch(term, (newVal) => {
@@ -52,7 +47,7 @@ watch(term, (newVal) => {
 <template>
   <Popover v-model:open="isPopoverOpen">
     <div
-    class="fixed top-2 left-96 flex items-center bg-white rounded shadow-lg z-9999">
+    class="fixed top-2 left-1/2 -translate-x-1/2 flex items-center bg-white rounded shadow-lg z-9999">
         <div class="relative w-full">
         <PopoverTrigger as-child>
           <Input 
@@ -62,7 +57,7 @@ watch(term, (newVal) => {
             id="search" 
             type="text" 
             placeholder="Search for a place" 
-            class="w-80 pl-10"
+            class="w-96 pl-10"
             @keyup="handleAutocomplete"
           />
           </PopoverTrigger>
@@ -71,7 +66,7 @@ watch(term, (newVal) => {
           </span>
          <Button 
             @click="emit('fetch-videos')" 
-            class="absolute left-80 top-1/2 -translate-y-1/2">
+            class="absolute left-96 top-1/2 -translate-y-1/2">
             Search videos here
           </Button>
         </div>

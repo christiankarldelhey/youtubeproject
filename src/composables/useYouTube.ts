@@ -1,9 +1,14 @@
 import { ref } from 'vue';
 import axios from 'axios';
-import type { VideoItem, DetailedVideoItem, YoutubeApiResponse, YoutubeDetailedApiResponse, FetchYoutubeParams } from '../types/Map';
+import type { 
+  VideoMarker, 
+  DetailedVideoItem, 
+  YoutubeApiResponse, 
+  YoutubeDetailedApiResponse, 
+  FetchYoutubeParams } from '../types/Map';
 
 export function useYoutube() {
-  const videos = ref<VideoItem[]>([]);
+  const videos = ref<VideoMarker[]>([]);
   const loading = ref(false);
   const error = ref<Error | null>(null);
 
@@ -41,9 +46,7 @@ export function useYoutube() {
     loading.value = true;
     error.value = null;
 
-    console.log('me llega este zoom: ', currentZoom);
     const currentRadius = calculateRadiusFromZoom(currentZoom ?? 10) ?? '1000km';
-    console.log('el radio: ', currentRadius);
 
     const endpoint = `https://youtube.googleapis.com/youtube/v3/search`;
 
@@ -66,13 +69,21 @@ export function useYoutube() {
       const videoIds = data.items.map(item => item.id.videoId);
 
       const detailedVideos = await fetchVideoDetails(videoIds, apiKey);
+
+      console.log('detailedVideos', detailedVideos);
       
       videos.value = data.items.map(item => {
         const detailedVideo = detailedVideos.find(video => video.id === item.id.videoId);
         return {
-          ...item,
-          recordingDetails: detailedVideo?.recordingDetails,
-          topicDetails: detailedVideo?.topicDetails
+          position: [
+            detailedVideo?.recordingDetails?.location?.latitude,
+            detailedVideo?.recordingDetails?.location?.longitude
+          ],
+          location: detailedVideo?.recordingDetails?.locationDescription,
+          title: detailedVideo?.snippet.title,
+          description: detailedVideo?.snippet.description,
+          videoId: detailedVideo?.id,
+          thumbnail: detailedVideo?.snippet.thumbnails.high.url,
         };
       });
 

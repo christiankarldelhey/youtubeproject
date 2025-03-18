@@ -3,70 +3,78 @@
   import { LMap, LTileLayer, LMarker, LPopup } from "@vue-leaflet/vue-leaflet";
   import 'leaflet.markercluster';
   import { LMarkerClusterGroup } from 'vue-leaflet-markercluster'
-  import { ref, computed, watch } from 'vue';
+  import { ref, watch, onMounted } from 'vue';
   import { useMap } from '../composables/useMap';
-  import type { VideoItem, VideoMarker } from '../types/Map';
+  import { Progress } from '@/components/ui/progress'
+  import type { VideoMarker } from '../types/Map';
   import { useMapStore } from '../store/mapStore';
 
-  window.L = L;
-
   const props = defineProps<{
-    videos: VideoItem[],
+    videos: VideoMarker[],
   }>();
 
   const mapStore = useMapStore();
-
-  const mapOptions = {
-    stadia: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
-    carto: 'https://{a-d}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
-    openstreetmap: 'https://{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
-    esri: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    google: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
-  }
-
-  const { initializeLeaflet } = useMap();
-  initializeLeaflet();
-
+  const { initializeLeaflet, getUserLocation, mapsList } = useMap();
   const mapRef = ref();
-
-  const videoMarkers = computed<VideoMarker[]>(() => {
-    return props.videos
-      .filter((video): video is VideoItem & { recordingDetails: { location: { latitude: number; longitude: number } } } => 
-        typeof video.recordingDetails?.location?.latitude === 'number' && 
-        typeof video.recordingDetails?.location?.longitude === 'number'
-      )
-      .map(video => ({
-        position: [
-          video.recordingDetails.location.latitude,
-          video.recordingDetails.location.longitude
-        ],
-        location: video.recordingDetails.locationDescription,
-        title: video.snippet.title,
-        description: video.snippet.description,
-        videoId: video.id.videoId,
-        thumbnail: video.snippet.thumbnails.high.url
-      }));
-  });
+  const mapReady = ref(false);
 
   const moveMapCenter = () => {
+    if (mapStore.flyToTarget) {
+      console.log('esta en movimiento automatico');
+      return;
+    } 
     console.log('move map center');
     if (mapRef.value?.leafletObject) {
+      console.log('es movimiento manual');
+      // New position from map
       const mapCenter = mapRef.value.leafletObject.getCenter();
+      const zoom = mapRef.value.leafletObject.getZoom();
+      //Update new position in PINIA
       mapStore.setCenter([mapCenter.lat, mapCenter.lng]);
-      mapStore.setZoom(mapRef.value.leafletObject.getZoom());
+      mapStore.setZoom(zoom);
     }
   };
 
   const onMapReady = () => {
-    console.log('map ready');
-  };
+  console.log('map ready');
+};
 
-watch(() => mapStore.bbox, (bbox) => {
-  if (mapRef.value?.leafletObject && bbox) {
-    mapRef.value.leafletObject.fitBounds(L.latLngBounds(
-      [bbox[0], bbox[1]],
-      [bbox[2], bbox[3]]
-    ));
+  // Fly to a place
+  watch(
+  () => mapStore.flyToTarget,
+  (target) => {
+    if (!target) return;
+    if (target?.bbox && mapRef.value?.leafletObject) {
+      mapRef.value.leafletObject.fitBounds(L.latLngBounds(
+        [target.bbox[1], target.bbox[0]],
+        [target.bbox[3], target.bbox[2]]
+      ));
+    }
+    mapStore.setZoom(target?.zoom ?? 12);
+    mapStore.setCenter(target?.center ?? [0, 0]);
+    mapStore.clearFlyToTarget();
+  }
+);
+
+const selectVideo = (video: VideoMarker) => {
+  mapStore.selectPin(video);
+}
+
+const openVideo = () => {
+  mapRef.value?.leafletObject.closePopup();
+  mapStore.setDialogOpen(true);
+};
+
+onMounted(async () => {
+  initializeLeaflet();
+  try {
+    const { latitude, longitude } = await getUserLocation();
+    mapStore.setCenter([latitude, longitude]);
+    mapStore.setZoom(12);
+  } catch {
+    mapStore.setZoom(2);
+  } finally {
+    mapReady.value = true;
   }
 });
 
@@ -74,25 +82,27 @@ watch(() => mapStore.bbox, (bbox) => {
 
 <template>
   <l-map 
+    v-if="mapReady"
     ref="mapRef" 
     v-model:zoom="mapStore.zoom" 
     :center="mapStore.center"
     @moveend="moveMapCenter"
     @ready="onMapReady">
     <l-tile-layer
-      :url="mapOptions.stadia"
+      :url="mapsList.stadia2"
       layer-type="base"
       name="map"
     ></l-tile-layer>
     <l-marker-cluster-group>
       <l-marker 
-      v-for="marker in videoMarkers"
+      v-for="marker in props.videos"
       :key="marker.videoId"
+      :selected="mapStore.selectedPin === marker"
+      @click="selectVideo(marker)"
       :lat-lng="marker.position">
-      <l-popup class="flex justify-center"> 
-        <a 
-        :href="`https://www.youtube.com/watch?v=${marker.videoId}`" 
-        target="_blank">
+      <l-popup 
+        @click="openVideo(marker)" 
+        class="relative cursor-pointer"> 
           <p class="text-gray-300">{{ marker.location?.toUpperCase() }}</p>
           <div class="relative w-64 h-36 overflow-hidden rounded">
             <img 
@@ -101,11 +111,16 @@ watch(() => mapStore.bbox, (bbox) => {
             class="w-full h-full object-cover" />
         </div>
         <p>{{ marker.title }}</p>
-      </a>
       </l-popup>
     </l-marker>
     </l-marker-cluster-group>
   </l-map>
+  <div v-else class="flex justify-center items-center bg-background w-full h-full">
+    <div class="flex flex-col items-center">
+      <p class="text-base text-gray-400">Loading map...</p>
+      <Progress class="w-64" :model-value="33" />
+    </div>
+  </div>
 </template>
 
 <style>
@@ -114,4 +129,5 @@ watch(() => mapStore.bbox, (bbox) => {
   height: 100%;
   z-index: 1;
 }
+
 </style>
