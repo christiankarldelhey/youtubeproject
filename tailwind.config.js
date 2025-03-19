@@ -23,10 +23,8 @@ module.exports = {
 			primary: '#2c3e50', // Deep slate blue (for contrast & readability)
 			secondary: '#8699a0', // Soft neutral blue-gray (for secondary elements)
 			accent: '#d47b54', // Warm muted orange (for highlights)
-			// background: '#f2f3f1', // Very light gray (for background elements)
-			background: '#848f9c',
+			background: '#f2f3f1', // Very light gray (for background elements)
 			foreground: '#c3c9cc', // Soft gray-blue (for text & UI elements)
-			
   		},
 		zIndex: {
 			9999: '9999',

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import { ref, computed, watch } from 'vue';
   import SearchBar from '../components/SearchBar.vue';
   import WorldMap from '../components/WorldMap.vue';
   import { useYoutube } from '../composables/useYouTube';
-  import AppSidebar from '@/components/AppSidebar.vue'
   import { SidebarProvider } from '@/components/ui/sidebar'
   import { useMapStore } from '../store/mapStore';
   import VideoDialog from '../components/VideoDialog.vue';
+  import VideoSidebar from '../components/VideoSidebar.vue';
 
   const mapStore = useMapStore();
 
@@ -16,12 +16,23 @@
   const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
   const { videos, loading, error, fetchYoutubeVideos } = useYoutube();
 
+  const sidebarOpen = ref(false);
+
+  watch(videos, (newVideos) => {
+  if (newVideos.length > 0) {
+    sidebarOpen.value = true;
+  }
+});
 </script>
 
 <template>
-  <SidebarProvider :open="videos.length > 0" :defaultOpen="false" class="border-stone-700" style="--sidebar-width: 23rem;">
-    <AppSidebar 
-      :videos="videos" />
+  <SidebarProvider 
+    :open="sidebarOpen"
+    :defaultOpen="false" 
+    style="--sidebar-width: 25rem;">
+   <VideoSidebar 
+    @handle-sidebar="sidebarOpen = $event"
+    :videos="videos" />
     <div class="flex flex-col w-full">
       <SearchBar 
         @fetch-videos="fetchYoutubeVideos({ apiKey, currentMapPosition, currentZoom })" />
@@ -38,5 +49,8 @@
 div[role="dialog"][data-state="open"] {
     z-index: 100000 !important;
     position: fixed !important;
+}
+div[data-aria-hidden = true][data-state="open"] {
+  z-index: 9999 !important;
 }
 </style>   

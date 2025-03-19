@@ -70,9 +70,12 @@ watch(term, (newVal) => {
             Search videos here
           </Button>
         </div>
-      <PopoverContent 
-        v-if="autocompleteResults && autocompleteResults.length > 0" 
-        class="w-80 bg-white rounded shadow-lg z-9999">
+        <PopoverContent 
+  v-if="autocompleteResults && autocompleteResults.length > 0" 
+  class="w-96 bg-white rounded shadow-lg z-9999"
+  side="bottom" 
+  align="start"
+>
         <div>
           <ul>
             <li 
