@@ -24,7 +24,7 @@ const closeDialog = () => {
         <DialogContent 
             modal
             @interact-outside="(e) => e.preventDefault()" 
-            class="bg-white max-w-4xl p-6 shadow-lg rounded-lg"
+            class="bg-background max-w-4xl p-6 shadow-lg rounded-lg"
             :style="{ backdropFilter: 'none' }"
         >
             <DialogHeader>

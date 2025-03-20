@@ -50,6 +50,9 @@
         [target.bbox[3], target.bbox[2]]
       ));
     }
+    if (!target?.bbox && mapRef.value?.leafletObject) {
+      mapRef.value.leafletObject.flyTo(target.center, target.zoom);
+    }
     mapStore.setZoom(target?.zoom ?? 12);
     mapStore.setCenter(target?.center ?? [0, 0]);
     mapStore.clearFlyToTarget();
@@ -103,7 +106,7 @@ onMounted(async () => {
       <l-popup 
         @click="openVideo(marker)" 
         class="relative cursor-pointer"> 
-          <p class="text-gray-300">{{ marker.location?.toUpperCase() }}</p>
+          <p class="text-primary">{{ marker.location?.toUpperCase() }}</p>
           <div class="relative w-64 h-36 overflow-hidden rounded">
             <img 
             :src="marker.thumbnail" 

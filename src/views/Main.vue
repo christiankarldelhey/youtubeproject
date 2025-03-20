@@ -17,19 +17,13 @@
   const { videos, loading, error, fetchYoutubeVideos } = useYoutube();
 
   const sidebarOpen = ref(false);
-
-  watch(videos, (newVideos) => {
-  if (newVideos.length > 0) {
-    sidebarOpen.value = true;
-  }
-});
 </script>
 
 <template>
   <SidebarProvider 
     :open="sidebarOpen"
     :defaultOpen="false" 
-    style="--sidebar-width: 25rem;">
+    style="--sidebar-width: 30rem;">
    <VideoSidebar 
     @handle-sidebar="sidebarOpen = $event"
     :videos="videos" />

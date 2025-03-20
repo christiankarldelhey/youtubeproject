@@ -57,7 +57,7 @@ watch(term, (newVal) => {
             id="search" 
             type="text" 
             placeholder="Search for a place" 
-            class="w-96 pl-10"
+            class="w-96 pl-10 rounded-l-md rounded-r-none"
             @keyup="handleAutocomplete"
           />
           </PopoverTrigger>
@@ -66,16 +66,16 @@ watch(term, (newVal) => {
           </span>
          <Button 
             @click="emit('fetch-videos')" 
-            class="absolute left-96 top-1/2 -translate-y-1/2">
+            class="absolute left-96 top-1/2 -translate-y-1/2 rounded-l-none rounded-r-md">
             Search videos here
           </Button>
         </div>
         <PopoverContent 
-  v-if="autocompleteResults && autocompleteResults.length > 0" 
-  class="w-96 bg-white rounded shadow-lg z-9999"
-  side="bottom" 
-  align="start"
->
+          v-if="autocompleteResults && autocompleteResults.length > 0" 
+          class="w-96 bg-white rounded shadow-lg z-9999"
+          side="bottom" 
+          align="start"
+        >
         <div>
           <ul>
             <li 
