@@ -62,6 +62,7 @@ export interface VideoSnippet {
     center: center;
     dialogOpen: boolean;
     selectedPin: selectedPin;
+    favoriteVideos?: VideoMarker[];
     flyToTarget: { center: center; zoom?: zoom, bbox?: bbox } | null;
   };
   
@@ -82,4 +83,5 @@ export interface VideoSnippet {
     location?: string;
     description?: string;
     thumbnail?: string;
+    favorited?: boolean;
   }

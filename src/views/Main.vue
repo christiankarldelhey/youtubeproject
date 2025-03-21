@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, computed, watch } from 'vue';
+  import { ref, computed } from 'vue';
   import SearchBar from '../components/SearchBar.vue';
   import WorldMap from '../components/WorldMap.vue';
   import { useYoutube } from '../composables/useYouTube';
@@ -9,6 +9,7 @@
   import VideoSidebar from '../components/VideoSidebar.vue';
 
   const mapStore = useMapStore();
+  const selectedOption = ref('none');
 
   const currentZoom = computed(() => mapStore.zoom);
   const currentMapPosition = computed(() => mapStore.center);
@@ -17,6 +18,10 @@
   const { videos, loading, error, fetchYoutubeVideos } = useYoutube();
 
   const sidebarOpen = ref(false);
+  const handleSidebar = (open: boolean, option: string) => {  
+    sidebarOpen.value = open;
+    selectedOption.value = option;
+  }
 </script>
 
 <template>
@@ -25,16 +30,17 @@
     :defaultOpen="false" 
     style="--sidebar-width: 30rem;">
    <VideoSidebar 
-    @handle-sidebar="sidebarOpen = $event"
+    @handle-sidebar="handleSidebar"
     :videos="videos" />
     <div class="flex flex-col w-full">
       <SearchBar 
         @fetch-videos="fetchYoutubeVideos({ apiKey, currentMapPosition, currentZoom })" />
-      <WorldMap :videos="videos" />
+        <WorldMap 
+          v-if="videos.length || mapStore.favoriteVideos?.length" 
+          :videos="selectedOption === 'favorites' ? mapStore.favoriteVideos : videos" />
     </div>
     <VideoDialog
       v-if="mapStore.selectedPin && mapStore.dialogOpen"
-      :video="mapStore.selectedPin"
       :open="mapStore.dialogOpen" />
   </SidebarProvider>
 </template>

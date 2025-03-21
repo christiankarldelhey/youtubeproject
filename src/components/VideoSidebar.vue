@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { List, Star, HeartIcon, XIcon } from "lucide-vue-next";
+import { List, HeartIcon, XIcon } from "lucide-vue-next";
 import { ref, watch } from "vue";
 import {
   Sidebar,
@@ -23,7 +23,7 @@ const { state } = useSidebar();
 const selectedOption = ref('none');
 
 const handleSidebar = (open: boolean, option: string) => {
-  emit('handleSidebar', open);
+  emit('handleSidebar', open, option);
   selectedOption.value = option;
 };
 

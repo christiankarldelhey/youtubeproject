@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
+import { HeartIcon } from "lucide-vue-next";
 import { useMapStore } from '../store/mapStore';
-import type { VideoMarker } from "../types/Map";
+import { ref } from 'vue';
 
 const mapStore = useMapStore();
+const selectedVideo = ref(mapStore.selectedPin);
 
-const props = defineProps<{
-    video: VideoMarker;
-}>();
+const toggleFavorite = () => {
+    mapStore.setSelectedPinAsFavorite(!selectedVideo.value?.favorited);
+};
 
 const closeDialog = () => {
     mapStore.setDialogOpen(false);
@@ -28,7 +30,15 @@ const closeDialog = () => {
             :style="{ backdropFilter: 'none' }"
         >
             <DialogHeader>
-                <DialogTitle>{{ props.video.title }}</DialogTitle>
+                <div class="flex flex-row gap-2">
+                    <HeartIcon 
+                    class="h-6 w-6 cursor-pointer transition-colors duration-200" 
+                    :class="{ 'fill-red-500 text-red-500': selectedVideo?.favorited }"
+                    @click="toggleFavorite" />
+                    <DialogTitle class="pt-1">
+                        {{ selectedVideo?.title }}
+                    </DialogTitle>
+                </div>
                 <DialogClose @click="closeDialog" class="absolute top-2 right-2 cursor-pointer text-gray-500 hover:text-gray-800">
                 </DialogClose>
             </DialogHeader>
@@ -36,7 +46,7 @@ const closeDialog = () => {
             <Card class="space-y-4">
                 <div class="relative w-full h-96 rounded overflow-hidden">
                     <iframe
-                        :src="`https://www.youtube.com/embed/${props.video.videoId}?autoplay=1&controls=1`"
+                        :src="`https://www.youtube.com/embed/${selectedVideo?.videoId}?autoplay=1&controls=1`"
                         title="YouTube video player"
                         frameborder="0"
                         allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

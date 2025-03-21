@@ -43,7 +43,7 @@ const goToLocation = (video: VideoMarker) => {
 
 <template>
     <div class="p-4 text-primary" v-if="videos.length === 0">
-        No videos found. Please explore another place and search again. 
+        No videos found. Please explore a location and click on the search videos button. 
     </div>
     <div v-else v-for="group in groupedVideoMarkers" :key="group.location">
         <div 

@@ -1,46 +1,44 @@
 <script setup lang="ts">
-  import L from 'leaflet';
-  import { LMap, LTileLayer, LMarker, LPopup } from "@vue-leaflet/vue-leaflet";
-  import 'leaflet.markercluster';
-  import { LMarkerClusterGroup } from 'vue-leaflet-markercluster'
-  import { ref, watch, onMounted } from 'vue';
-  import { useMap } from '../composables/useMap';
-  import { Progress } from '@/components/ui/progress'
-  import type { VideoMarker } from '../types/Map';
-  import { useMapStore } from '../store/mapStore';
+import L from 'leaflet';
+import { LMap, LTileLayer, LMarker, LPopup } from "@vue-leaflet/vue-leaflet";
+import 'leaflet.markercluster';
+import { LMarkerClusterGroup } from 'vue-leaflet-markercluster'
+import { ref, watch, onMounted } from 'vue';
+import { useMap } from '../composables/useMap';
+import { Progress } from '@/components/ui/progress'
+import type { VideoMarker } from '../types/Map';
+import { useMapStore } from '../store/mapStore';
 
-  const props = defineProps<{
-    videos: VideoMarker[],
-  }>();
+const props = defineProps<{
+  videos: VideoMarker[],
+}>();
 
-  const mapStore = useMapStore();
-  const { initializeLeaflet, getUserLocation, mapsList } = useMap();
-  const mapRef = ref();
-  const mapReady = ref(false);
+const mapStore = useMapStore();
+const { initializeLeaflet, getUserLocation, mapsList, heartIcon, defaultIcon } = useMap();
+const mapRef = ref();
+const mapReady = ref(false);
 
-  const moveMapCenter = () => {
-    if (mapStore.flyToTarget) {
-      console.log('esta en movimiento automatico');
-      return;
-    } 
-    console.log('move map center');
-    if (mapRef.value?.leafletObject) {
-      console.log('es movimiento manual');
-      // New position from map
-      const mapCenter = mapRef.value.leafletObject.getCenter();
-      const zoom = mapRef.value.leafletObject.getZoom();
-      //Update new position in PINIA
-      mapStore.setCenter([mapCenter.lat, mapCenter.lng]);
-      mapStore.setZoom(zoom);
-    }
-  };
+const moveMapCenter = () => {
+  if (mapStore.flyToTarget) {
+    console.log('esta en movimiento automatico');
+    return;
+  } 
+  console.log('move map center');
+  if (mapRef.value?.leafletObject) {
+    console.log('es movimiento manual');
+    const mapCenter = mapRef.value.leafletObject.getCenter();
+    const zoom = mapRef.value.leafletObject.getZoom();
+    mapStore.setCenter([mapCenter.lat, mapCenter.lng]);
+    mapStore.setZoom(zoom);
+  }
+};
 
-  const onMapReady = () => {
+const onMapReady = () => {
   console.log('map ready');
 };
 
-  // Fly to a place
-  watch(
+// Fly to a place
+watch(
   () => mapStore.flyToTarget,
   (target) => {
     if (!target) return;
@@ -80,7 +78,6 @@ onMounted(async () => {
     mapReady.value = true;
   }
 });
-
 </script>
 
 <template>
@@ -91,33 +88,38 @@ onMounted(async () => {
     :center="mapStore.center"
     @moveend="moveMapCenter"
     @ready="onMapReady">
+    
     <l-tile-layer
       :url="mapsList.stadia2"
       layer-type="base"
       name="map"
-    ></l-tile-layer>
+    />
+    
     <l-marker-cluster-group>
       <l-marker 
-      v-for="marker in props.videos"
-      :key="marker.videoId"
-      :selected="mapStore.selectedPin === marker"
-      @click="selectVideo(marker)"
-      :lat-lng="marker.position">
-      <l-popup 
-        @click="openVideo(marker)" 
-        class="relative cursor-pointer"> 
+        v-for="marker in props.videos"
+        :key="marker.videoId"
+        :lat-lng="marker.position"
+        :icon="marker.favorited ? heartIcon : defaultIcon"
+        @click="selectVideo(marker)">
+        
+        <l-popup 
+          @click="openVideo(marker)" 
+          class="relative cursor-pointer"> 
           <p class="text-primary">{{ marker.location?.toUpperCase() }}</p>
           <div class="relative w-64 h-36 overflow-hidden rounded">
             <img 
-            :src="marker.thumbnail" 
-            alt="Video Thumbnail"
-            class="w-full h-full object-cover" />
-        </div>
-        <p>{{ marker.title }}</p>
-      </l-popup>
-    </l-marker>
+              :src="marker.thumbnail" 
+              alt="Video Thumbnail"
+              class="w-full h-full object-cover" />
+          </div>
+          <p>{{ marker.title }}</p>
+        </l-popup>
+      </l-marker>
     </l-marker-cluster-group>
+    
   </l-map>
+  
   <div v-else class="flex justify-center items-center bg-background w-full h-full">
     <div class="flex flex-col items-center">
       <p class="text-base text-primary">Loading map...</p>
@@ -132,5 +134,4 @@ onMounted(async () => {
   height: 100%;
   z-index: 1;
 }
-
 </style>
