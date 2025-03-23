@@ -1,15 +1,24 @@
 <script setup lang="ts">
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
+import { useFavorites } from '../composables/useFavorites';
 import { HeartIcon } from "lucide-vue-next";
 import { useMapStore } from '../store/mapStore';
 import { ref } from 'vue';
 
 const mapStore = useMapStore();
 const selectedVideo = ref(mapStore.selectedPin);
+const { favorites, removeFavorite, addFavorite } = useFavorites();
 
 const toggleFavorite = () => {
-    mapStore.setSelectedPinAsFavorite(!selectedVideo.value?.favorited);
+    selectedVideo.value.favorited = !selectedVideo.value?.favorited;
+    // mapStore.setSelectedPinAsFavorite(!selectedVideo.value?.favorited);
+    if (selectedVideo.value?.favorited) {
+        console.log('add favoriteee', selectedVideo.value);
+        addFavorite(selectedVideo.value!);
+    } else {
+        removeFavorite(selectedVideo.value?.videoId!);
+    }
 };
 
 const closeDialog = () => {

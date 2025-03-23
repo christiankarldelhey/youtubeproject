@@ -4,15 +4,16 @@ import { useMapStore } from '../store/mapStore';
 import { removeEmojisAndUppercaseWords } from '@/utils/utils.ts';
 import type { VideoMarker } from '../types/Map';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useFavorites } from '../composables/useFavorites';
 import { ChevronUpIcon, ChevronDownIcon, MapPin } from 'lucide-vue-next';
 
 const mapStore = useMapStore();
 const collapsedLocations = ref<Record<string, boolean>>({});
-const favoritedVideos = mapStore.favoriteVideos;
+const { favorites } = useFavorites();
 
 const groupedVideoMarkers = computed(() => {
   const locationMap: Record<string, VideoMarker[]> = {};
-    favoritedVideos?.forEach(video => {
+    favorites.value?.forEach(video => {
     const location = video.location || 'Unknown';
     if (!locationMap[location]) {
       locationMap[location] = [];
@@ -41,7 +42,7 @@ const goToLocation = (video: VideoMarker) => {
 </script>
 
 <template>
-    <div class="p-4 text-primary" v-if="favoritedVideos?.length === 0">
+    <div class="p-4 text-primary" v-if="favorites?.length === 0">
         You dont have favorited videos yet. Please add some. 
     </div>
     <div v-else v-for="group in groupedVideoMarkers" :key="group.location">
@@ -50,7 +51,12 @@ const goToLocation = (video: VideoMarker) => {
         @click="toggleCollapse(group.location)">
         <div class="flex items-center gap-2">
             <MapPin class="h-4 w-4 text-gray-500" />
-            <span class="text-sm text-gray-600"> {{ group.location.toUpperCase() }} </span>
+            <span 
+                class="text-sm text-gray-600 truncate max-w-[250px] block"
+                :title="group.location.toUpperCase()"
+            >
+                {{ group.location.toUpperCase() }}
+            </span>
         </div>        
         <div class="flex items-center gap-4">
             <Avatar class="bg-foreground text-primary h-6 w-6">

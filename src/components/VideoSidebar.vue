@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useSidebar } from "@/components/ui/sidebar/utils";
+import { useFavorites } from '../composables/useFavorites';
 import type { VideoMarker } from "../types/Map";
 import { Button } from '@/components/ui/button';
 import VideoSearchList from './VideoSearchList.vue';
@@ -19,6 +20,8 @@ import VideoFavorites from './VideoFavorites.vue';
 const emit = defineEmits(['handleSidebar']);
 const props = defineProps<{ videos: VideoMarker[] }>();
 const { state } = useSidebar();
+
+const { favorites, addFavorite, removeFavorite } = useFavorites();
 
 const selectedOption = ref('none');
 

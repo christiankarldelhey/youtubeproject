@@ -65,17 +65,17 @@ const goToLocation = (video: VideoMarker) => {
         <div 
             v-for="video in group.videos" 
             :key="video.videoId"
-            class="cursor-pointer px-4 py-2 text-primary hover:bg-foreground">
-            <p class="text-sm">{{ removeEmojisAndUppercaseWords(video.title) }}</p>
-            <a @click="goToLocation(video)" class="text-sm"> Go to video location </a>
+            class="cursor-pointer flex flex-row justify-between p-4 text-primary hover:bg-foreground">
             <div class="flex flex-col" @click="openVideo(video)">
-                <div class="relative w-64 h-36 overflow-hidden rounded">
+                <div class="relative w-52 h-28 overflow-hidden rounded">
                 <img 
                     :src="video.thumbnail" 
                     alt="Video Thumbnail"
                     class="w-full h-full object-cover" />
                 </div>
             </div>
+            <p class="text-sm">{{ removeEmojisAndUppercaseWords(video.title) }}</p>
+            <!-- <a @click="goToLocation(video)" class="text-sm"> Go to video location </a> -->
         </div>
         </div>
     </div>

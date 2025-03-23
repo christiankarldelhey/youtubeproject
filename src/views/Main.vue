@@ -7,9 +7,11 @@
   import { useMapStore } from '../store/mapStore';
   import VideoDialog from '../components/VideoDialog.vue';
   import VideoSidebar from '../components/VideoSidebar.vue';
+  import { useFavorites } from '../composables/useFavorites';
 
   const mapStore = useMapStore();
   const selectedOption = ref('none');
+  const { favorites } = useFavorites();
 
   const currentZoom = computed(() => mapStore.zoom);
   const currentMapPosition = computed(() => mapStore.center);
@@ -28,7 +30,7 @@
   <SidebarProvider 
     :open="sidebarOpen"
     :defaultOpen="false" 
-    style="--sidebar-width: 30rem;">
+    style="--sidebar-width: 35rem;">
    <VideoSidebar 
     @handle-sidebar="handleSidebar"
     :videos="videos" />
@@ -36,8 +38,7 @@
       <SearchBar 
         @fetch-videos="fetchYoutubeVideos({ apiKey, currentMapPosition, currentZoom })" />
         <WorldMap 
-          v-if="videos.length || mapStore.favoriteVideos?.length" 
-          :videos="selectedOption === 'favorites' ? mapStore.favoriteVideos : videos" />
+          :videos="selectedOption === 'favorites' ? favorites : videos" />
     </div>
     <VideoDialog
       v-if="mapStore.selectedPin && mapStore.dialogOpen"
