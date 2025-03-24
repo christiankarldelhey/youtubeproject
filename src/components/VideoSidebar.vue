@@ -14,14 +14,13 @@ import { useSidebar } from "@/components/ui/sidebar/utils";
 import { useFavorites } from '../composables/useFavorites';
 import type { VideoMarker } from "../types/Map";
 import { Button } from '@/components/ui/button';
-import VideoSearchList from './VideoSearchList.vue';
-import VideoFavorites from './VideoFavorites.vue';
+import VideoList from './VideoList.vue';
+
+const { favorites } = useFavorites();
 
 const emit = defineEmits(['handleSidebar']);
 const props = defineProps<{ videos: VideoMarker[] }>();
 const { state } = useSidebar();
-
-const { favorites, addFavorite, removeFavorite } = useFavorites();
 
 const selectedOption = ref('none');
 
@@ -73,13 +72,14 @@ watch(() => props.videos, (newVideos) => {
         <div 
             v-if="state === 'expanded'" 
             class="flex-1 h-screen overflow-y-auto bg-background">
-            <div class="flex flex-row justify-between text-primary border-b cursor-pointer p-4">
+            <div class="flex flex-row justify-between text-primary border-b cursor-pointer p-4 
+            sticky top-0 bg-background z-10 shadow-sm">
                 <span v-if="selectedOption === 'search'">Search results</span>
                 <span v-if="selectedOption === 'favorites'">Favorited videos</span>
                 <XIcon @click="handleSidebar(false, 'none')" class="h-6 w-6" />
             </div>
-            <VideoSearchList v-if="selectedOption === 'search'" :videos="props.videos" />
-            <VideoFavorites  v-if="selectedOption === 'favorites'" />
+            <VideoList v-if="selectedOption === 'search'" :videos="props.videos" />
+            <VideoList v-if="selectedOption === 'favorites'" :videos="favorites" />
         </div>
   
       </SidebarContent>

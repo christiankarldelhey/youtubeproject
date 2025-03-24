@@ -10,16 +10,22 @@ const mapStore = useMapStore();
 const selectedVideo = ref(mapStore.selectedPin);
 const { favorites, removeFavorite, addFavorite } = useFavorites();
 
-const toggleFavorite = () => {
-    selectedVideo.value.favorited = !selectedVideo.value?.favorited;
-    // mapStore.setSelectedPinAsFavorite(!selectedVideo.value?.favorited);
-    if (selectedVideo.value?.favorited) {
-        console.log('add favoriteee', selectedVideo.value);
-        addFavorite(selectedVideo.value!);
+const toggleFavorite = async () => {
+    if (!selectedVideo.value) return;
+
+    const isFavorite = favorites.value.some(fav => fav.videoId === selectedVideo.value.videoId);
+
+    if (!isFavorite) {
+        console.log("Adding favorite:", selectedVideo.value);
+        selectedVideo.value.favorited = true;
+        await addFavorite(selectedVideo.value);
     } else {
-        removeFavorite(selectedVideo.value?.videoId!);
+        console.log("Removing favorite:", selectedVideo.value.videoId);
+        selectedVideo.value.favorited = false;
+        await removeFavorite(selectedVideo.value.videoId);
     }
 };
+
 
 const closeDialog = () => {
     mapStore.setDialogOpen(false);

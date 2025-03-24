@@ -20,12 +20,9 @@ const mapReady = ref(false);
 
 const moveMapCenter = () => {
   if (mapStore.flyToTarget) {
-    console.log('esta en movimiento automatico');
     return;
   } 
-  console.log('move map center');
   if (mapRef.value?.leafletObject) {
-    console.log('es movimiento manual');
     const mapCenter = mapRef.value.leafletObject.getCenter();
     const zoom = mapRef.value.leafletObject.getZoom();
     mapStore.setCenter([mapCenter.lat, mapCenter.lng]);

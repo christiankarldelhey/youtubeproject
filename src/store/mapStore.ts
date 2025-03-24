@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { MapStoreState, zoom, center, selectedPin, bbox, VideoMarker } from '../types/Map';
+import type { MapStoreState, zoom, center, selectedPin, bbox } from '../types/Map';
 
 export const useMapStore = defineStore('map', {
   state: () => ({
@@ -8,7 +8,6 @@ export const useMapStore = defineStore('map', {
     selectedPin: null,
     flyToTarget: null as { center: center; zoom?: zoom, bbox?: bbox } | null,
     dialogOpen: false,
-    favoriteVideos: [] as VideoMarker[],
   }) as MapStoreState,
   actions: {
     setZoom(newZoom: zoom): void {
@@ -31,19 +30,6 @@ export const useMapStore = defineStore('map', {
     },
     clearSelectedPin() {
       this.selectedPin = null;
-    },
-    setSelectedPinAsFavorite(value: boolean) { 
-      console.log('hola'); 
-      if (this.selectedPin) {
-        this.selectedPin.favorited = value;
-        if (value) {
-          console.log('agrega');
-          this.favoriteVideos?.push(this.selectedPin);
-        } else {
-          console.log('quita');
-          this.favoriteVideos = this.favoriteVideos?.filter(v => v.videoId !== this.selectedPin?.videoId);
-        }
-      }
     },
   },
 });
