@@ -5,6 +5,7 @@ import 'leaflet.markercluster';
 import { LMarkerClusterGroup } from 'vue-leaflet-markercluster'
 import { ref, watch, onMounted } from 'vue';
 import { useMap } from '../composables/useMap';
+import { MapPin } from 'lucide-vue-next';
 import { Progress } from '@/components/ui/progress'
 import type { VideoMarker } from '../types/Map';
 import { useMapStore } from '../store/mapStore';
@@ -20,6 +21,7 @@ const { initializeLeaflet, getUserLocation, mapsList, heartIcon, defaultIcon } =
 const mapRef = ref();
 const mapReady = ref(false);
 
+
 const moveMapCenter = () => {
   if (mapStore.flyToTarget) {
     return;
@@ -29,11 +31,15 @@ const moveMapCenter = () => {
     const zoom = mapRef.value.leafletObject.getZoom();
     mapStore.setCenter([mapCenter.lat, mapCenter.lng]);
     mapStore.setZoom(zoom);
+    zoom >= 4 ? mapStore.setShowSearchButton(true) : mapStore.setShowSearchButton(false);
   }
 };
 
 const onMapReady = () => {
   console.log('map ready');
+  if (mapRef.value?.leafletObject) {
+      mapRef.value.leafletObject.zoomControl.setPosition('bottomright');
+    }
 };
 
 watch(
@@ -56,7 +62,6 @@ watch(
         easeLinearity: 0.1,
       });
     }
-
     mapStore.setZoom(target?.zoom ?? 12);
     mapStore.setCenter(target?.center ?? [0, 0]);
     mapStore.clearFlyToTarget();
@@ -81,8 +86,8 @@ onMounted(async () => {
   } catch {
     mapStore.setZoom(2);
   } finally {
+    emit('fetch-videos');
     mapReady.value = true;
-    emit('fetch-videos')
   }
 });
 </script>
@@ -113,7 +118,9 @@ onMounted(async () => {
         <l-popup 
           @click="openVideo(marker)" 
           class="relative cursor-pointer"> 
-          <p class="text-primary">{{ marker.location?.toUpperCase() }}</p>
+          <span class="text-primary flex flex-row mb-2">
+            <MapPin class="w-4 h-4 mr-1" /> {{ marker.location?.toUpperCase() }}
+          </span>
           <div class="relative w-64 h-36 overflow-hidden rounded">
             <img 
               :src="marker.thumbnail" 

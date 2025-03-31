@@ -63,6 +63,7 @@ export interface VideoSnippet {
     dialogOpen: boolean;
     selectedPin: selectedPin;
     favoriteVideos?: VideoMarker[];
+    showSearchButton: boolean;
     flyToTarget: { center: center; zoom?: zoom, bbox?: bbox } | null;
   };
   

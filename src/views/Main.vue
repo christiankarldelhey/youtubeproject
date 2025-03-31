@@ -8,6 +8,9 @@
   import VideoDialog from '../components/VideoDialog.vue';
   import VideoSidebar from '../components/VideoSidebar.vue';
   import { useFavorites } from '../composables/useFavorites';
+  import type { center, zoom } from '../types/Map';
+  import { Button } from '@/components/ui/button';
+  import { Search } from 'lucide-vue-next';
 
   const mapStore = useMapStore();
   const selectedOption = ref('none');
@@ -24,6 +27,11 @@
     sidebarOpen.value = open;
     selectedOption.value = option;
   }
+
+  const fetchVideos = (currentMapPosition: center, currentZoom: zoom) => {
+    fetchYoutubeVideos({ apiKey, currentMapPosition, currentZoom });
+    mapStore.setShowSearchButton(false);
+  }
 </script>
 
 <template>
@@ -34,12 +42,19 @@
    <VideoSidebar 
     @handle-sidebar="handleSidebar"
     :videos="videos" />
+    <Button 
+      v-if="mapStore.showSearchButton"
+      @click="fetchVideos(currentMapPosition, currentZoom)" 
+      variant="secondary"
+      class="absolute z-9999 left-1/2 top-16 transform -translate-x-1/2 border text-sm">
+      <Search class="w-4 h-4 mr-2" /> Videos in this area
+    </Button>
     <div class="flex flex-col w-full">
       <SearchBar 
-        @fetch-videos="fetchYoutubeVideos({ apiKey, currentMapPosition, currentZoom })" />
+        @fetch-videos="fetchVideos(currentMapPosition, currentZoom)" />
         <WorldMap 
           :videos="selectedOption === 'favorites' ? favorites : videos" 
-          @fetch-videos="fetchYoutubeVideos({ apiKey, currentMapPosition, currentZoom })"
+          @fetch-videos="fetchVideos(currentMapPosition, currentZoom)"
           />
     </div>
     <VideoDialog

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { Input } from '@/components/ui/input';
-import { Button }from '@/components/ui/button';
-import { Search } from 'lucide-vue-next';
+import { MapPin } from 'lucide-vue-next';
 import { useSearchLocation } from '../composables/useSearchLocation';
 import type { GeoFeature } from '../composables/useSearchLocation';
 import {
@@ -47,7 +46,7 @@ watch(term, (newVal) => {
 <template>
   <Popover v-model:open="isPopoverOpen">
     <div
-    class="fixed top-4 right-0 -translate-x-1/2 flex items-center bg-white rounded shadow-lg z-9999">
+    class="fixed top-4 right-4 flex items-center bg-white rounded shadow-lg z-9999">
         <div class="relative w-full">
         <PopoverTrigger as-child>
           <Input 
@@ -57,18 +56,13 @@ watch(term, (newVal) => {
             id="search" 
             type="text" 
             placeholder="Search for a place" 
-            class="w-96 pl-10 rounded-l-md rounded-r-none"
+            class="w-96 pl-10"
             @keyup="handleAutocomplete"
           />
           </PopoverTrigger>
           <span class="absolute left-3 top-1/2 -translate-y-1/2">
-            <Search class="h-4 w-4 text-muted-foreground" />
+            <MapPin class="h-4 w-4 text-muted-foreground" />
           </span>
-         <Button 
-            @click="emit('fetch-videos')" 
-            class="absolute left-96 top-1/2 -translate-y-1/2 rounded-l-none rounded-r-md">
-            Search videos here
-          </Button>
         </div>
         <PopoverContent 
           v-if="autocompleteResults && autocompleteResults.length > 0" 

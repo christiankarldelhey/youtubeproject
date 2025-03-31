@@ -8,6 +8,7 @@ export const useMapStore = defineStore('map', {
     selectedPin: null,
     flyToTarget: null as { center: center; zoom?: zoom, bbox?: bbox } | null,
     dialogOpen: false,
+    showSearchButton: false,
   }) as MapStoreState,
   actions: {
     setZoom(newZoom: zoom): void {
@@ -21,6 +22,9 @@ export const useMapStore = defineStore('map', {
     },
     setDialogOpen(value: boolean): void {
       this.dialogOpen = value;
+    },
+    setShowSearchButton(value: boolean): void {
+      this.showSearchButton = value;
     },
     triggerFlyTo(center: center, zoom?: zoom, bbox?: bbox) {
       this.flyToTarget = { center, zoom, bbox };

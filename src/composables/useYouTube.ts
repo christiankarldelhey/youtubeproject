@@ -7,6 +7,7 @@ import type {
   YoutubeDetailedApiResponse, 
   FetchYoutubeParams } from '../types/Map';
 
+
 export function useYoutube() {
   const videos = ref<VideoMarker[]>([]);
   const loading = ref(false);
@@ -32,7 +33,8 @@ export function useYoutube() {
   };
 
   const calculateRadiusFromZoom = (zoomLevel: number): string => {
-    const radiusKm = 40075 / Math.pow(2, zoomLevel); 
+    const reductionFactor = 0.8;
+    const radiusKm = (40075 / Math.pow(2, zoomLevel)) * reductionFactor;
     const limitedRadius = Math.min(Math.ceil(radiusKm), 1000);
     return `${limitedRadius}km`;
   };
