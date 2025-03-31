@@ -13,6 +13,8 @@ const props = defineProps<{
   videos: VideoMarker[],
 }>();
 
+const emit = defineEmits(['fetch-videos']);
+
 const mapStore = useMapStore();
 const { initializeLeaflet, getUserLocation, mapsList, heartIcon, defaultIcon } = useMap();
 const mapRef = ref();
@@ -34,20 +36,27 @@ const onMapReady = () => {
   console.log('map ready');
 };
 
-// Fly to a place
 watch(
   () => mapStore.flyToTarget,
   (target) => {
-    if (!target) return;
-    if (target?.bbox && mapRef.value?.leafletObject) {
+    if (!target || !mapRef.value?.leafletObject) return;
+
+    if (target?.bbox) {
+      console.log('Using fitBounds');
       mapRef.value.leafletObject.fitBounds(L.latLngBounds(
         [target.bbox[1], target.bbox[0]],
         [target.bbox[3], target.bbox[2]]
       ));
+    } else {
+      console.log('Using flyTo');
+      mapRef.value.leafletObject.flyTo(target.center, target.zoom ?? 12, 
+      {
+        animate: true,
+        duration: 2.5,
+        easeLinearity: 0.1,
+      });
     }
-    if (!target?.bbox && mapRef.value?.leafletObject) {
-      mapRef.value.leafletObject.flyTo(target.center, target.zoom);
-    }
+
     mapStore.setZoom(target?.zoom ?? 12);
     mapStore.setCenter(target?.center ?? [0, 0]);
     mapStore.clearFlyToTarget();
@@ -73,6 +82,7 @@ onMounted(async () => {
     mapStore.setZoom(2);
   } finally {
     mapReady.value = true;
+    emit('fetch-videos')
   }
 });
 </script>

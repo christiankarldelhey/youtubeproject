@@ -36,7 +36,9 @@ const openVideo = (video: VideoMarker) => {
 };
 
 const goToLocation = (video: VideoMarker) => {
-  mapStore.triggerFlyTo(video.position, 12);
+  setTimeout(() => {
+    mapStore.triggerFlyTo(video.position, 15);
+  }, 1000);
 };
 
 </script>
@@ -63,12 +65,13 @@ const goToLocation = (video: VideoMarker) => {
         </div>
         <div v-show="!collapsedLocations[group.location]" class="space-y-2">
         <div 
-            v-for="video in group.videos" 
+            v-for="video in group.videos"
+            @click="openVideo(video)"
             :key="video.videoId"
             class="cursor-pointer p-4 text-primary hover:bg-foreground">
             <h4 class="pb-2 font-semibold">{{ removeEmojisAndUppercaseWords(video.title) }}</h4>
             <div class="flex flex-row justify-between">
-              <div class="flex flex-col flex-shrink-0" @click="openVideo(video)">
+              <div class="flex flex-col flex-shrink-0">
                 <div class="relative w-48 h-28 overflow-hidden rounded">
                   <img 
                       :src="video.thumbnail" 

@@ -59,15 +59,15 @@ const closeDialog = () => {
             </DialogHeader>
             
             <Card class="space-y-4">
-                <div class="relative w-full h-96 rounded overflow-hidden">
-                    <iframe
-                        :src="`https://www.youtube.com/embed/${selectedVideo?.videoId}?autoplay=1&controls=1`"
-                        title="YouTube video player"
-                        frameborder="0"
-                        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowfullscreen
-                        class="w-full h-full"
-                    ></iframe>
+                <div class="relative w-full h-9/10 rounded overflow-hidden">
+                <iframe
+                    :src="`https://www.youtube.com/embed/${selectedVideo?.videoId}?autoplay=1&controls=1`"
+                    title="YouTube video player"
+                    frameborder="0"
+                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                    class="w-full h-full object-cover aspect-video"
+                ></iframe>
                 </div>
             </Card>
         </DialogContent>

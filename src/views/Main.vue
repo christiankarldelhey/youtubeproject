@@ -38,7 +38,9 @@
       <SearchBar 
         @fetch-videos="fetchYoutubeVideos({ apiKey, currentMapPosition, currentZoom })" />
         <WorldMap 
-          :videos="selectedOption === 'favorites' ? favorites : videos" />
+          :videos="selectedOption === 'favorites' ? favorites : videos" 
+          @fetch-videos="fetchYoutubeVideos({ apiKey, currentMapPosition, currentZoom })"
+          />
     </div>
     <VideoDialog
       v-if="mapStore.selectedPin && mapStore.dialogOpen"
