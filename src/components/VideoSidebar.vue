@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { List, HeartIcon, XIcon } from "lucide-vue-next";
+import { Search, HeartIcon, XIcon } from "lucide-vue-next";
 import { ref, watch } from "vue";
 import {
   Sidebar,
@@ -50,7 +50,7 @@ watch(() => props.videos, (newVideos) => {
                     class="flex items-center gap-2 w-full p-2 rounded-md transition-colors
                             cursor-pointer bg-white text-primary hover:bg-primary/30" 
                     :class="{ 'bg-primary/30': selectedOption === 'search' }">
-                    <List />
+                    <Search />
                   </Button>
                 </SidebarMenuButton>
               </SidebarMenuItem>

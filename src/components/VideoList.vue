@@ -63,12 +63,12 @@ const goToLocation = (video: VideoMarker) => {
             <ChevronUpIcon v-else />
         </div>
         </div>
-        <div v-show="!collapsedLocations[group.location]" class="space-y-2">
+        <div v-show="!collapsedLocations[group.location]">
         <div 
             v-for="video in group.videos"
             @click="openVideo(video)"
             :key="video.videoId"
-            class="cursor-pointer p-4 text-primary hover:bg-foreground">
+            class="cursor-pointer p-4 border-b text-primary hover:bg-foreground">
             <h4 class="pb-2 font-semibold">{{ removeEmojisAndUppercaseWords(video.title) }}</h4>
             <div class="flex flex-row justify-between">
               <div class="flex flex-col flex-shrink-0">

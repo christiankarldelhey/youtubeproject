@@ -46,7 +46,7 @@ watch(term, (newVal) => {
 <template>
   <Popover v-model:open="isPopoverOpen">
     <div
-    class="fixed top-4 right-4 flex items-center bg-white rounded shadow-lg z-9999">
+    class="fixed top-5 right-20 flex items-center bg-white rounded shadow-lg z-9998">
         <div class="relative w-full">
         <PopoverTrigger as-child>
           <Input 
@@ -66,7 +66,7 @@ watch(term, (newVal) => {
         </div>
         <PopoverContent 
           v-if="autocompleteResults && autocompleteResults.length > 0" 
-          class="w-96 bg-white rounded shadow-lg z-9999"
+          class="w-96 bg-white rounded shadow-lg z-9998"
           side="bottom" 
           align="start"
         >

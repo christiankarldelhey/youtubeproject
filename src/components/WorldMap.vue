@@ -36,10 +36,7 @@ const moveMapCenter = () => {
 };
 
 const onMapReady = () => {
-  console.log('map ready');
-  if (mapRef.value?.leafletObject) {
-      mapRef.value.leafletObject.zoomControl.setPosition('bottomright');
-    }
+  mapRef.value.leafletObject?.zoomControl.setPosition('bottomright');
 };
 
 watch(
@@ -82,7 +79,7 @@ onMounted(async () => {
   try {
     const { latitude, longitude } = await getUserLocation();
     mapStore.setCenter([latitude, longitude]);
-    mapStore.setZoom(12);
+    mapStore.setZoom(13);
   } catch {
     mapStore.setZoom(2);
   } finally {
@@ -117,8 +114,8 @@ onMounted(async () => {
         
         <l-popup 
           @click="openVideo(marker)" 
-          class="relative cursor-pointer"> 
-          <span class="text-primary flex flex-row mb-2">
+          class="relative cursor-pointer z-9999"> 
+          <span class="z-9999 text-primary flex flex-row mb-2">
             <MapPin class="w-4 h-4 mr-1" /> {{ marker.location?.toUpperCase() }}
           </span>
           <div class="relative w-64 h-36 overflow-hidden rounded">
@@ -147,5 +144,8 @@ onMounted(async () => {
   width: 100%;
   height: 100%;
   z-index: 1;
+}
+:deep(.leaflet-pane.leaflet-popup-pane) {
+  z-index: 100000 !important;
 }
 </style>
