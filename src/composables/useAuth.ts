@@ -1,17 +1,13 @@
 import { ref } from 'vue';
-import { app } from '../firebase';
 import { 
-  getAuth, 
   sendSignInLinkToEmail, 
   signInWithEmailLink, 
   isSignInWithEmailLink, 
-  onAuthStateChanged
+  onAuthStateChanged 
 } from "firebase/auth";
-
+import { auth } from "../firebase";
 import type { User } from "firebase/auth";
 
-const auth = getAuth(app);
-// const auth = getAuth();
 const user = ref<User | null>(null);
 
 onAuthStateChanged(auth, (firebaseUser) => {
@@ -23,7 +19,6 @@ export function useAuth() {
   const userEmail = ref(localStorage.getItem('emailForSignIn') || '');
 
   const sendLoginLink = async (email: string) => {
-    console.log('Sending login link to:', email, window.location.href);
     const actionCodeSettings = {
       url: window.location.href,
       handleCodeInApp: true
@@ -37,7 +32,7 @@ export function useAuth() {
       userEmail.value = localStorage.getItem('emailForSignIn') || '';
       if (userEmail.value) {
         const userCredential = await signInWithEmailLink(auth, userEmail.value, window.location.href);
-        user.value = userCredential.user; // ✅ Updates user
+        user.value = userCredential.user;
         localStorage.removeItem('emailForSignIn');
         return user.value;
       }

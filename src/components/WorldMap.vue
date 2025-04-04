@@ -51,7 +51,6 @@ watch(
         [target.bbox[3], target.bbox[2]]
       ));
     } else {
-      console.log('Using flyTo');
       mapRef.value.leafletObject.flyTo(target.center, target.zoom ?? 12, 
       {
         animate: true,
@@ -104,7 +103,7 @@ onMounted(async () => {
       name="map"
     />
     
-    <l-marker-cluster-group>
+    <l-marker-cluster-group :key="videos.length + JSON.stringify(videos.map(v => v.videoId))">
       <l-marker 
         v-for="marker in props.videos"
         :key="marker.videoId"
@@ -128,7 +127,7 @@ onMounted(async () => {
         </l-popup>
       </l-marker>
     </l-marker-cluster-group>
-    
+
   </l-map>
   
   <div v-else class="flex justify-center items-center bg-background w-full h-full">

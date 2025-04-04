@@ -79,8 +79,13 @@ const goToLocation = (video: VideoMarker) => {
                       class="w-full h-full object-cover" />
                 </div>
               </div>
-              <div class="flex flex-col px-4 culo flex-grow max-w-[60%]">
-                <p class="text-sm line-clamp-6 overflow-hidden">{{ video.description }}</p>
+              <div class="flex flex-col px-4 flex-grow max-w-[60%]">
+                <p 
+                  class="text-sm leading-tight line-clamp-6 overflow-hidden cursor-pointer" 
+                  :title="video.description"
+                >
+                  {{ video.description }}
+                </p>
               </div>
             </div>
         </div>

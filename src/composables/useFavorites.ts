@@ -1,15 +1,13 @@
-import { ref, onUnmounted } from 'vue';
-import { db } from "../firebase";
+import { ref, onUnmounted, watchEffect } from 'vue';
+import { db, auth } from "../firebase";
 import { collection, addDoc, deleteDoc, doc, onSnapshot, getDocs } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
 import type { VideoMarker } from '../types/Map';
-
-const auth = getAuth();
 
 export function useFavorites() {
   const favorites = ref<VideoMarker[]>([]);
   const loading = ref(false);
   const error = ref<Error | null>(null);
+
 
   const fetchFavorites = async () => {
     const user = auth.currentUser;
@@ -42,7 +40,6 @@ export function useFavorites() {
         position: video.position
       });
 
-      // Fetch updated favorites after adding a new one
       fetchFavorites();
     } catch (err) {
       error.value = err as Error;
@@ -52,38 +49,47 @@ export function useFavorites() {
 
   const removeFavorite = async (videoId: string) => {
     const user = auth.currentUser;
-    if (!user) return; // Return if no user is authenticated
+    if (!user) return;
 
     try {
       const snapshot = await getDocs(collection(db, `users/${user.uid}/favorites`));
       const docToDelete = snapshot.docs.find(doc => doc.data().videoId === videoId);
 
-      if (!docToDelete) {
-        console.error("No matching favorite found for videoId:", videoId);
-        return;
-      }
+      if (!docToDelete) return;
 
       await deleteDoc(doc(db, `users/${user.uid}/favorites`, docToDelete.id));
-      fetchFavorites();
+      fetchFavorites(); // Refresh favorites after removal
     } catch (err) {
       error.value = err as Error;
       console.error("Error removing favorite:", err);
     }
   };
 
-  // Fetch favorites on component mount
-  const unsubscribe = onSnapshot(collection(db, `users/${auth.currentUser?.uid}/favorites`), (snapshot) => {
-    favorites.value = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as VideoMarker[];
-  }, (err) => {
-    error.value = err;
-    console.error("Error fetching favorites:", err);
+  // Firebase auth state listener to load favorites when the user is authenticated
+  const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+    if (user) {
+      fetchFavorites(); // Fetch favorites only when user is authenticated
+    }
   });
+
+  // Listen for real-time updates on the user's favorites
+  const unsubscribe = onSnapshot(
+    collection(db, `users/${auth.currentUser?.uid}/favorites`),
+    (snapshot) => {
+      favorites.value = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as VideoMarker[];
+    },
+    (err) => {
+      error.value = err;
+      console.error("Error in snapshot:", err);
+    }
+  );
 
   onUnmounted(() => {
     unsubscribe();
+    unsubscribeAuth();
   });
 
   return {
