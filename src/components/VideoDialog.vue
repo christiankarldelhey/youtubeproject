@@ -54,7 +54,9 @@ const closeDialog = () => {
                         {{ selectedVideo?.title }}
                     </DialogTitle>
                 </div>
-                <DialogClose @click="closeDialog" class="absolute top-2 right-2 cursor-pointer text-gray-500 hover:text-gray-800">
+                <DialogClose 
+                    @click="closeDialog" 
+                    class="absolute top-2 right-2 cursor-pointer text-gray-500 hover:text-gray-800">
                 </DialogClose>
             </DialogHeader>
             

@@ -8,6 +8,7 @@
   import VideoDialog from '../components/VideoDialog.vue';
   import VideoSidebar from '../components/VideoSidebar.vue';
   import { useFavorites } from '../composables/useFavorites';
+  import { useAuth } from '../composables/useAuth';
   import type { center, zoom } from '../types/Map';
   import { Button } from '@/components/ui/button';
   import { Search } from 'lucide-vue-next';
@@ -16,6 +17,7 @@
   const mapStore = useMapStore();
   const selectedOption = ref('none');
   const { favorites } = useFavorites();
+  const { user } = useAuth();
 
   const currentZoom = computed(() => mapStore.zoom);
   const currentMapPosition = computed(() => mapStore.center);
@@ -30,7 +32,7 @@
   }
 
   const fetchVideos = (currentMapPosition: center, currentZoom: zoom) => {
-    fetchYoutubeVideos({ apiKey, currentMapPosition, currentZoom });
+    fetchYoutubeVideos({ apiKey, currentMapPosition, currentZoom, searchQuery: mapStore.searchQuery });
     mapStore.setShowSearchButton(false);
   }
 </script>
@@ -47,10 +49,12 @@
       v-if="mapStore.showSearchButton"
       @click="fetchVideos(currentMapPosition, currentZoom)" 
       variant="secondary"
-      class="absolute z-9999 left-1/2 top-16 transform -translate-x-1/2 border text-sm">
+      class="absolute z-9999 left-1/2 top-24 transform -translate-x-1/2 border text-sm">
       <Search class="w-2 h-2" /> Videos in this area
     </Button>
-    <UserOptions />
+    <UserOptions 
+      :user="user" 
+      class="z-9999" />
     <SearchBar @fetch-videos="fetchVideos(currentMapPosition, currentZoom)" />
     <div class="flex flex-col w-full">
         <WorldMap 

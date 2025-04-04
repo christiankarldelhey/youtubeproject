@@ -9,8 +9,12 @@ export const useMapStore = defineStore('map', {
     flyToTarget: null as { center: center; zoom?: zoom, bbox?: bbox } | null,
     dialogOpen: false,
     showSearchButton: false,
+    searchQuery: 'travel',
   }) as MapStoreState,
   actions: {
+    setSearchQuery(query: string): void {
+      this.searchQuery = query;
+    },
     setZoom(newZoom: zoom): void {
       this.zoom = newZoom;
     },

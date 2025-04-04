@@ -11,6 +11,9 @@ import {
 } from '@/components/ui/popover';
 import type { center, bbox } from '../types/Map';
 import { useMapStore } from '../store/mapStore';
+import { useAuth } from '../composables/useAuth';
+
+const { user } = useAuth();
 
 const mapStore = useMapStore();
 const emit = defineEmits(['fetch-videos']);
@@ -46,7 +49,9 @@ watch(term, (newVal) => {
 <template>
   <Popover v-model:open="isPopoverOpen">
     <div
-    class="fixed top-5 right-20 flex items-center bg-white rounded shadow-lg z-9998">
+    class="fixed top-5 flex items-center bg-white rounded shadow-lg z-9999"
+    :class="user ? 'right-20' : 'right-48'"
+    >
         <div class="relative w-full">
         <PopoverTrigger as-child>
           <Input 
@@ -56,7 +61,7 @@ watch(term, (newVal) => {
             id="search" 
             type="text" 
             placeholder="Search for a place" 
-            class="w-96 pl-10"
+            class="w-80 pl-10"
             @keyup="handleAutocomplete"
           />
           </PopoverTrigger>
@@ -66,7 +71,7 @@ watch(term, (newVal) => {
         </div>
         <PopoverContent 
           v-if="autocompleteResults && autocompleteResults.length > 0" 
-          class="w-96 bg-white rounded shadow-lg z-9998"
+          class="w-80 bg-white rounded shadow-lg z-9999"
           side="bottom" 
           align="start"
         >

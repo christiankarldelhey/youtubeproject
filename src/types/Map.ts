@@ -1,3 +1,5 @@
+import type { User } from "firebase/auth";
+
 export type zoom = number;
 export type center = [number, number];
 export type selectedPin = VideoMarker | null;
@@ -58,12 +60,14 @@ export interface VideoSnippet {
   };
 
   export type MapStoreState = { 
+    user: User | null;
     zoom: zoom;
     center: center;
     dialogOpen: boolean;
     selectedPin: selectedPin;
     favoriteVideos?: VideoMarker[];
     showSearchButton: boolean;
+    searchQuery: string;
     flyToTarget: { center: center; zoom?: zoom, bbox?: bbox } | null;
   };
   
@@ -75,6 +79,7 @@ export interface VideoSnippet {
     apiKey: string;
     currentMapPosition?: number[];
     currentZoom?: number;
+    searchQuery?: string;
   }
 
   export interface VideoMarker {

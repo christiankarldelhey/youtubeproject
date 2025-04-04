@@ -42,6 +42,7 @@ export function useYoutube() {
   const fetchYoutubeVideos = async ({
     maxResults = 50,
     apiKey,
+    searchQuery,
     currentMapPosition,
     currentZoom,
   }: FetchYoutubeParams): Promise<void> => {
@@ -56,7 +57,7 @@ export function useYoutube() {
       part: 'snippet',
       relevanceLanguage: 'es',
       maxResults,
-      q: 'travel',
+      q: searchQuery,
       type: 'video',
       key: apiKey,
       location: currentMapPosition ? `${currentMapPosition[0]},${currentMapPosition[1]}` : '0,0',

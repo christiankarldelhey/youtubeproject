@@ -31,7 +31,7 @@ const moveMapCenter = () => {
     const zoom = mapRef.value.leafletObject.getZoom();
     mapStore.setCenter([mapCenter.lat, mapCenter.lng]);
     mapStore.setZoom(zoom);
-    zoom >= 4 ? mapStore.setShowSearchButton(true) : mapStore.setShowSearchButton(false);
+    zoom >= 5 ? mapStore.setShowSearchButton(true) : mapStore.setShowSearchButton(false);
   }
 };
 

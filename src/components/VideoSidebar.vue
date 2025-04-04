@@ -15,6 +15,9 @@ import { useFavorites } from '../composables/useFavorites';
 import type { VideoMarker } from "../types/Map";
 import { Button } from '@/components/ui/button';
 import VideoList from './VideoList.vue';
+import { useMapStore } from '../store/mapStore';
+
+const mapStore = useMapStore();
 
 const { favorites } = useFavorites();
 
@@ -74,7 +77,7 @@ watch(() => props.videos, (newVideos) => {
             class="flex-1 h-screen overflow-y-auto bg-background">
             <div class="flex flex-row justify-between text-primary border-b cursor-pointer p-4 
             sticky top-0 bg-background z-10 shadow-sm">
-                <span v-if="selectedOption === 'search'">Search results</span>
+                <span v-if="selectedOption === 'search'">Search videos with the term: {{ mapStore.searchQuery }}</span>
                 <span v-if="selectedOption === 'favorites'">Favorited videos</span>
                 <XIcon @click="handleSidebar(false, 'none')" class="h-6 w-6" />
             </div>
