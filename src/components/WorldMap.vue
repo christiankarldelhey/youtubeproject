@@ -107,7 +107,7 @@ onMounted(async () => {
       <l-marker 
         v-for="marker in props.videos"
         :key="marker.videoId"
-        :lat-lng="marker.position"
+        :lat-lng="marker.position ?? mapStore.center"
         :icon="marker.favorited ? heartIcon : defaultIcon"
         @click="selectVideo(marker)">
         

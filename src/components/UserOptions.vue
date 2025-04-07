@@ -16,7 +16,6 @@ import {
   User,
 } from 'lucide-vue-next'
 import LoginDialog from './LoginDialog.vue';
-import SettingsDialog from './SettingsDialog.vue';
 import type { User as UserType } from "firebase/auth";
 import { ref } from 'vue';
 
@@ -24,12 +23,6 @@ const props = defineProps<{ user: UserType | null }>();
 
 let type = 'Login';
 const loginDialogOpen = ref(false);
-const settingsDialogOpen = ref(false);
-
-const manageSettingsDialog = (value: boolean) => {
-  console.log('que pacha', value);
-  settingsDialogOpen.value = value;
-};
 
 const manageLoginDialog = (value: boolean, newType: string) => {
   type = newType;
@@ -44,21 +37,17 @@ const emit = defineEmits(['close']);
   <template v-if="props.user">
     <DropdownMenu>
       <DropdownMenuTrigger as-child>
-      <Avatar 
-        class="absolute z-9999 right-1 top-5 transform -translate-x-1/2 border text-sm bg-white text-primary border cursor-pointer">
-          <AvatarImage src="/src/assets/user.svg" alt="user" />
-          <AvatarFallback>CN</AvatarFallback>
-      </Avatar>
+      <Button
+          class="absolute z-9999 px-2 right-1 top-5 flex items-center rounded-md
+                    cursor-pointer bg-white text-primary hover:bg-white" >
+          <User class="" />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent class="mr-4 mt-2 w-48 z-9999 bg-background ">
         <DropdownMenuLabel>{{ user?.email }}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <User class="mr-2 h-4 w-4" />
-            <span>Profile</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem @click="manageSettingsDialog(true)">
+          <DropdownMenuItem @click="">
             <Settings class="mr-2 h-4 w-4" />
             <span>Settings</span>
           </DropdownMenuItem>
@@ -94,7 +83,4 @@ const emit = defineEmits(['close']);
     :open="loginDialogOpen" 
     @close="manageLoginDialog(false, 'Login')"
     :type="type" />
-  <SettingsDialog 
-    :open="settingsDialogOpen" 
-    @close="manageSettingsDialog(false)" />
 </template>

@@ -77,7 +77,7 @@ watch(() => props.videos, (newVideos) => {
             class="flex-1 h-screen overflow-y-auto bg-background">
             <div class="flex flex-row justify-between text-primary border-b cursor-pointer p-4 
             sticky top-0 bg-background z-10 shadow-sm">
-                <span v-if="selectedOption === 'search'">Search videos with the term: {{ mapStore.searchQuery }}</span>
+                <span v-if="selectedOption === 'search'">{{ mapStore.searchQuery.label }} videos in the area </span>
                 <span v-if="selectedOption === 'favorites'">Favorited videos</span>
                 <XIcon @click="handleSidebar(false, 'none')" class="h-6 w-6" />
             </div>

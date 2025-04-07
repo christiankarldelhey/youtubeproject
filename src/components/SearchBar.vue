@@ -11,9 +11,13 @@ import {
 } from '@/components/ui/popover';
 import type { center, bbox } from '../types/Map';
 import { useMapStore } from '../store/mapStore';
+import SearchSettingsDialog from './SearchSettingsDialog.vue';
 import { useAuth } from '../composables/useAuth';
+import { useSearchSettings } from '../composables/useSearchSettings';
+import { Button } from '@/components/ui/button';
 
 const { user } = useAuth();
+const { iconMap } = useSearchSettings();
 
 const mapStore = useMapStore();
 const emit = defineEmits(['fetch-videos']);
@@ -38,6 +42,12 @@ const closeAndGoToLocation = (coordinates: center, bbox?: bbox) => {
   mapStore.triggerFlyTo([lat, lng], 12, bbox);
 };
 
+const settingsDialogOpen = ref(false);
+
+const manageSettingsDialog = (value: boolean) => {
+  settingsDialogOpen.value = value;
+};
+
 watch(term, (newVal) => {
   if (!newVal) {
     isPopoverOpen.value = false;
@@ -49,10 +59,10 @@ watch(term, (newVal) => {
 <template>
   <Popover v-model:open="isPopoverOpen">
     <div
-    class="fixed top-5 flex items-center bg-white rounded shadow-lg z-9999"
-    :class="user ? 'right-20' : 'right-48'"
+    class="fixed top-5 flex items-center z-9999"
+    :class="user ? 'right-16' : 'right-48'"
     >
-        <div class="relative w-full">
+        <div class="relative w-full bg-white rounded shadow-lg">
         <PopoverTrigger as-child>
           <Input 
             v-model="term"
@@ -69,6 +79,12 @@ watch(term, (newVal) => {
             <MapPin class="h-4 w-4 text-muted-foreground" />
           </span>
         </div>
+        <Button
+            @click="manageSettingsDialog(true)"
+            class="flex items-center gap-2 w-full p-2 ml-2 rounded-md transition-colors
+                    cursor-pointer bg-white text-primary hover:bg-white" >
+            <component :is="iconMap[mapStore.searchQuery.icon]" />
+        </Button>
         <PopoverContent 
           v-if="autocompleteResults && autocompleteResults.length > 0" 
           class="w-80 bg-white rounded shadow-lg z-9999"
@@ -90,4 +106,7 @@ watch(term, (newVal) => {
       </PopoverContent>
     </div>
   </Popover>
+  <SearchSettingsDialog 
+    :open="settingsDialogOpen" 
+    @close="manageSettingsDialog(false)" />
 </template>

@@ -14,6 +14,8 @@ const collapsedLocations = ref<Record<string, boolean>>({});
 const groupedVideoMarkers = computed(() => {
   const locationMap: Record<string, VideoMarker[]> = {};
   props.videos.forEach(video => {
+    console.log(video);
+    console.log(video.location);
     const location = video.location || 'Unknown';
     if (!locationMap[location]) {
       locationMap[location] = [];

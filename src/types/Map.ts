@@ -67,7 +67,7 @@ export interface VideoSnippet {
     selectedPin: selectedPin;
     favoriteVideos?: VideoMarker[];
     showSearchButton: boolean;
-    searchQuery: string;
+    searchQuery: SearchOption;
     flyToTarget: { center: center; zoom?: zoom, bbox?: bbox } | null;
   };
   
@@ -80,6 +80,12 @@ export interface VideoSnippet {
     currentMapPosition?: number[];
     currentZoom?: number;
     searchQuery?: string;
+  }
+
+  export interface SearchOption {
+    value: string;
+    label: string;
+    icon: string;
   }
 
   export interface VideoMarker {

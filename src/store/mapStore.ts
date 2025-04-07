@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { MapStoreState, zoom, center, selectedPin, bbox } from '../types/Map';
+import type { MapStoreState, zoom, center, selectedPin, bbox, SearchOption } from '../types/Map';
 
 export const useMapStore = defineStore('map', {
   state: () => ({
@@ -9,10 +9,10 @@ export const useMapStore = defineStore('map', {
     flyToTarget: null as { center: center; zoom?: zoom, bbox?: bbox } | null,
     dialogOpen: false,
     showSearchButton: false,
-    searchQuery: 'travel',
+    searchQuery: { value: 'travel', label: 'Travel (general travel videos)', icon: 'Luggage' },
   }) as MapStoreState,
   actions: {
-    setSearchQuery(query: string): void {
+    setSearchQuery(query: SearchOption): void {
       this.searchQuery = query;
     },
     setZoom(newZoom: zoom): void {

@@ -32,7 +32,7 @@
   }
 
   const fetchVideos = (currentMapPosition: center, currentZoom: zoom) => {
-    fetchYoutubeVideos({ apiKey, currentMapPosition, currentZoom, searchQuery: mapStore.searchQuery });
+    fetchYoutubeVideos({ apiKey, currentMapPosition, currentZoom, searchQuery: mapStore.searchQuery.value });
     mapStore.setShowSearchButton(false);
   }
 </script>

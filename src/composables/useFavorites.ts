@@ -8,17 +8,17 @@ export function useFavorites() {
   const loading = ref(false);
   const error = ref<Error | null>(null);
 
-
   const fetchFavorites = async () => {
     const user = auth.currentUser;
     if (!user) return;
-
+    console.log('fetch favorites');
     try {
       const querySnapshot = await getDocs(collection(db, `users/${user.uid}/favorites`));
       favorites.value = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       })) as VideoMarker[];
+      console.log('new favorites', favorites.value);
     } catch (err) {
       error.value = err as Error;
       console.error("Error fetching favorites:", err);

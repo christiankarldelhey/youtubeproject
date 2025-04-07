@@ -57,13 +57,14 @@ export function useYoutube() {
       part: 'snippet',
       relevanceLanguage: 'es',
       maxResults,
-      q: searchQuery,
+      q: searchQuery ?? 'travel',
       type: 'video',
       key: apiKey,
       location: currentMapPosition ? `${currentMapPosition[0]},${currentMapPosition[1]}` : '0,0',
       locationRadius: currentRadius,
       order: 'relevance',
       videoCategoryId: 19,
+      videoSyndicated: true,
       videoDuration: 'medium',
     };
 
