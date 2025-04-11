@@ -4,27 +4,39 @@ import { Card } from "@/components/ui/card";
 import { useFavorites } from '../composables/useFavorites';
 import { HeartIcon } from "lucide-vue-next";
 import { useMapStore } from '../store/mapStore';
+import { useToast } from "@/components/ui/toast";
 import { ref } from 'vue';
+
+const { toast } = useToast();
 
 const mapStore = useMapStore();
 const selectedVideo = ref(mapStore.selectedPin);
 const { favorites, removeFavorite, addFavorite } = useFavorites();
 
 const toggleFavorite = async () => {
-    if (!selectedVideo.value) return;
+  if (!selectedVideo.value) return;
 
-    const isFavorite = favorites.value.some(fav => fav.videoId === selectedVideo.value.videoId);
+  const isFavorite = favorites.value.some(fav => fav.videoId === selectedVideo.value?.videoId);
 
-    if (!isFavorite) {
-        console.log("Adding favorite:", selectedVideo.value);
-        selectedVideo.value.favorited = true;
-        await addFavorite(selectedVideo.value);
-    } else {
-        console.log("Removing favorite:", selectedVideo.value.videoId);
-        selectedVideo.value.favorited = false;
-        await removeFavorite(selectedVideo.value.videoId);
-    }
+  if (!isFavorite) {
+    selectedVideo.value.favorited = true;
+    await addFavorite(selectedVideo.value!);
+    console.log('sale favorite?');
+    toast({
+      title: "Added to favorites",
+      description: `"${selectedVideo.value.title}" was added to your favorites.`,
+    });
+  } else {
+    selectedVideo.value.favorited = false;
+    await removeFavorite(selectedVideo.value.videoId);
+
+    toast({
+      title: "Removed from favorites",
+      description: `"${selectedVideo.value.title}" was removed from your favorites.`,
+    });
+  }
 };
+
 
 
 const closeDialog = () => {
@@ -75,3 +87,9 @@ const closeDialog = () => {
         </DialogContent>
     </Dialog>
 </template>
+
+<style scoped>
+    ol {
+        z-index: 10000 !important;
+    }
+</style>

@@ -11,8 +11,11 @@
   import { useAuth } from '../composables/useAuth';
   import type { center, zoom } from '../types/Map';
   import { Button } from '@/components/ui/button';
-  import { Search } from 'lucide-vue-next';
   import UserOptions from '../components/UserOptions.vue';
+  import { useSearchSettings } from '../composables/useSearchSettings';
+  import { Toaster } from '@/components/ui/toast'
+
+  const { iconMap } = useSearchSettings();
 
   const mapStore = useMapStore();
   const selectedOption = ref('none');
@@ -51,7 +54,10 @@
       @click="fetchVideos(currentMapPosition, currentZoom)" 
       variant="secondary"
       class="absolute z-9999 left-1/2 top-24 transform -translate-x-1/2 border text-sm">
-      <Search class="w-2 h-2" /> Videos in this area
+      <component 
+        :is="iconMap[mapStore.searchQuery.icon as keyof typeof iconMap]" 
+        class="w-2 h-2" /> 
+          Videos in this area
     </Button>
     <UserOptions 
       :user="user" 
@@ -67,6 +73,7 @@
       v-if="mapStore.selectedPin && mapStore.dialogOpen"
       :open="mapStore.dialogOpen" />
   </SidebarProvider>
+  <Toaster />
 </template>
 
 <style>
@@ -76,5 +83,10 @@ div[role="dialog"][data-state="open"] {
 }
 div[data-aria-hidden = true][data-state="open"] {
   z-index: 9999 !important;
+}
+
+:deep(.toast-root),
+:deep(.toaster) {
+  z-index: 100000 !important;
 }
 </style>   

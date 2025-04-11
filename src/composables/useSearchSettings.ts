@@ -1,21 +1,21 @@
-import { Luggage, Utensils, Bed, Tent, PiggyBank } from 'lucide-vue-next';
+import { Utensils, Bed, Tent, CircleDollarSign, MapIcon } from 'lucide-vue-next';
 
 export function useSearchSettings() {
 
     const iconMap = {
-        Luggage,
+        MapIcon,
         Utensils,
         Bed,
         Tent,
-        PiggyBank,
+        CircleDollarSign,
     };
 
     const searchOptions = [
-        { value: 'travel', label: 'Travel (general travel videos)', icon: 'Luggage' },
+        { value: 'travel', label: 'Travel (general travel videos)', icon: 'MapIcon' },
         { value: 'food', label: 'Gastronomy', icon: 'Utensils' },
         { value: 'hotel', label: 'Accomodation', icon: 'Bed' },
         { value: 'hiking', label: 'Hiking (Outdoors)', icon: 'Tent' },
-        { value: 'budget', label: 'Travel on a budget', icon: 'PiggyBank' },
+        { value: 'budget', label: 'Travel on a budget', icon: 'CircleDollarSign' },
       ];
 
     return {

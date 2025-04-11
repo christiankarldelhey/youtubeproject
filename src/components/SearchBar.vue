@@ -83,7 +83,7 @@ watch(term, (newVal) => {
             @click="manageSettingsDialog(true)"
             class="flex items-center gap-2 w-full p-2 ml-2 rounded-md transition-colors
                     cursor-pointer bg-white text-primary hover:bg-white" >
-            <component :is="iconMap[mapStore.searchQuery.icon]" />
+            <component :is="iconMap[mapStore.searchQuery.icon as keyof typeof iconMap]" />
         </Button>
         <PopoverContent 
           v-if="autocompleteResults && autocompleteResults.length > 0" 

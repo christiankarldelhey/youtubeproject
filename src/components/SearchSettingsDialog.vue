@@ -14,8 +14,9 @@ const mapStore = useMapStore();
 const saveSettings = () => {
   const selectedObject = searchOptions.find(option => 
     option.value === selectedOption.value);
-  mapStore.setSearchQuery(selectedObject!);
-  emit('close');
+    mapStore.setSearchQuery(selectedObject!);
+    emit('close');
+    mapStore.setShowSearchButton(true);
 };
 
 const selectedOption = ref(mapStore.searchQuery.value);
@@ -37,9 +38,9 @@ const emit = defineEmits(['close']);
             </DialogHeader>
             <RadioGroup v-model="selectedOption" class="mt-5">
                 <div v-for="option in searchOptions" class="flex flex-row" :key="option.value">
-                    <RadioGroupItem :value="option.value" :id="option.value" />
-                    <Component :is="iconMap[option.icon]" class="ml-2 h-5 w-5" />
-                    <Label :for="option.value" class="ml-2">
+                    <Component :is="iconMap[option.icon as keyof typeof iconMap]" class="mr-2 h-5 w-5" />
+                    <RadioGroupItem class="h-5 w-5" :value="option.value" :id="option.value" />
+                    <Label :for="option.value" class="ml-2 pt-1">
                         {{ option.label }}
                     </Label>
                 </div>

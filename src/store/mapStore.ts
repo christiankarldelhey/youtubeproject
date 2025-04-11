@@ -9,7 +9,7 @@ export const useMapStore = defineStore('map', {
     flyToTarget: null as { center: center; zoom?: zoom, bbox?: bbox } | null,
     dialogOpen: false,
     showSearchButton: false,
-    searchQuery: { value: 'travel', label: 'Travel (general travel videos)', icon: 'Luggage' },
+    searchQuery: { value: 'travel', label: 'Travel (general travel videos)', icon: 'MapIcon' },
   }) as MapStoreState,
   actions: {
     setSearchQuery(query: SearchOption): void {
