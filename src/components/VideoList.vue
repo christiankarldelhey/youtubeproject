@@ -37,11 +37,11 @@ const openVideo = (video: VideoMarker) => {
   mapStore.selectPin(video);
 };
 
-const goToLocation = (video: VideoMarker) => {
-  setTimeout(() => {
-    mapStore.triggerFlyTo(video.position, 15);
-  }, 1000);
-};
+// const goToLocation = (video: VideoMarker) => {
+//   setTimeout(() => {
+//     mapStore.triggerFlyTo(video.position, 15);
+//   }, 1000);
+// };
 
 </script>
 

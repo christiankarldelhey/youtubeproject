@@ -18,8 +18,14 @@ export function useFavorites() {
       const querySnapshot = await getDocs(collection(db, `users/${user.uid}/favorites`));
       favorites.value = querySnapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data()
-      })) as VideoMarker[];
+        videoId: doc.id,
+        title: doc.data().title,
+        thumbnail: doc.data().thumbnail,
+        favorited: doc.data().favorited ?? false,
+        description: doc.data().description ?? '',
+        location: doc.data().location ?? '',
+        position: doc.data().position ?? [0, 0],
+      }));
       console.log('new favorites', favorites.value);
     } catch (err) {
       error.value = err as Error;
@@ -33,7 +39,7 @@ export function useFavorites() {
 
     try {
       await addDoc(collection(db, `users/${user.uid}/favorites`), {
-        videoId: video.videoId,
+        id: video.videoId,
         title: video.title,
         thumbnail: video.thumbnail,
         favorited: true,
@@ -80,7 +86,13 @@ export function useFavorites() {
       (snapshot) => {
         favorites.value = snapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data()
+          videoId: doc.id,
+          title: doc.data().title,
+          thumbnail: doc.data().thumbnail,
+          favorited: true,
+          description: doc.data().description,
+          location: doc.data().location,
+          position: doc.data().position,
         })) as VideoMarker[];
       },
       (err) => {

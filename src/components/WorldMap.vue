@@ -73,6 +73,10 @@ const openVideo = () => {
   mapStore.setDialogOpen(true);
 };
 
+const getMarkerIcon = (marker: VideoMarker): L.Icon<L.IconOptions> => {
+  return (marker.favorited ? heartIcon : defaultIcon) as L.Icon<L.IconOptions>;
+};
+
 onMounted(async () => {
   initializeLeaflet();
   try {
@@ -108,11 +112,11 @@ onMounted(async () => {
         v-for="marker in props.videos"
         :key="marker.videoId"
         :lat-lng="marker.position ?? mapStore.center"
-        :icon="marker.favorited ? heartIcon : defaultIcon"
+        :icon="getMarkerIcon(marker)"
         @click="selectVideo(marker)">
         
         <l-popup 
-          @click="openVideo(marker)" 
+          @click="openVideo()" 
           class="relative cursor-pointer z-9999"> 
           <span class="z-9999 text-primary flex flex-row mb-2">
             <MapPin class="w-4 h-4 mr-1" /> {{ marker.location?.toUpperCase() }}

@@ -26,7 +26,7 @@
   const currentMapPosition = computed(() => mapStore.center);
 
   const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
-  const { videos, loading, error, fetchYoutubeVideos } = useYoutube();
+  const { videos, fetchYoutubeVideos } = useYoutube();
 
   const sidebarOpen = ref(false);
   const handleSidebar = (open: boolean, option: string) => {  

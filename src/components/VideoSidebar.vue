@@ -11,7 +11,6 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useSidebar } from "@/components/ui/sidebar/utils";
-import { useFavorites } from '../composables/useFavorites';
 import type { VideoMarker } from "../types/Map";
 import { Button } from '@/components/ui/button';
 import VideoList from './VideoList.vue';

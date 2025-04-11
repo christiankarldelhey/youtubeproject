@@ -22,7 +22,7 @@ const { iconMap } = useSearchSettings();
 const mapStore = useMapStore();
 const emit = defineEmits(['fetch-videos']);
 
-const { autocompleteSearchLocation, currentLocation, loading } = useSearchLocation();
+const { autocompleteSearchLocation } = useSearchLocation();
 const term = ref('');
 const isPopoverOpen = ref(false);
 
@@ -31,7 +31,8 @@ const autocompleteResults = ref<GeoFeature[] | null>(null);
 const handleAutocomplete = async () => {
   const results = await autocompleteSearchLocation(term.value);
   autocompleteResults.value = results || null;
-  isPopoverOpen.value = results && results.length > 0;
+  if (!results) return;
+  isPopoverOpen.value = results.length > 0;
 };
 
 const closeAndGoToLocation = (coordinates: center, bbox?: bbox) => {
@@ -62,7 +63,7 @@ watch(term, (newVal) => {
     class="fixed top-5 flex items-center z-9999"
     :class="user ? 'right-16' : 'right-48'"
     >
-        <div class="relative w-full bg-white rounded shadow-lg">
+      <div class="relative w-full bg-white rounded shadow-lg">
         <PopoverTrigger as-child>
           <Input 
             v-model="term"
