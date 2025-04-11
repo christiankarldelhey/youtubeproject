@@ -44,6 +44,7 @@
     style="--sidebar-width: 35rem;">
    <VideoSidebar 
     @handle-sidebar="handleSidebar"
+    :favorites="favorites"
     :videos="videos" />
     <Button 
       v-if="mapStore.showSearchButton"

@@ -19,10 +19,8 @@ import { useMapStore } from '../store/mapStore';
 
 const mapStore = useMapStore();
 
-const { favorites } = useFavorites();
-
 const emit = defineEmits(['handleSidebar']);
-const props = defineProps<{ videos: VideoMarker[] }>();
+const props = defineProps<{ videos: VideoMarker[]; favorites: VideoMarker[] }>();
 const { state } = useSidebar();
 
 const selectedOption = ref('none');
@@ -82,7 +80,7 @@ watch(() => props.videos, (newVideos) => {
                 <XIcon @click="handleSidebar(false, 'none')" class="h-6 w-6" />
             </div>
             <VideoList v-if="selectedOption === 'search'" :videos="props.videos" />
-            <VideoList v-if="selectedOption === 'favorites'" :videos="favorites" />
+            <VideoList v-if="selectedOption === 'favorites'" :videos="props.favorites" />
         </div>
   
       </SidebarContent>
