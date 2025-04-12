@@ -21,12 +21,13 @@ const toggleFavorite = async () => {
   if (!isFavorite) {
     selectedVideo.value.favorited = true;
     await addFavorite(selectedVideo.value!);
-    console.log('sale favorite?');
+    console.log('agrega favorite?');
     toast({
       title: "Added to favorites",
       description: `"${selectedVideo.value.title}" was added to your favorites.`,
     });
   } else {
+    console.log('saca favorite?');
     selectedVideo.value.favorited = false;
     await removeFavorite(selectedVideo.value.videoId);
 
