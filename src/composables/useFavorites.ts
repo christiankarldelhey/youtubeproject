@@ -17,10 +17,9 @@ export function useFavorites() {
     try {
       const querySnapshot = await getDocs(collection(db, `users/${user.uid}/favorites`));
       favorites.value = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        videoId: doc.id,
-        title: doc.data().title,
-        thumbnail: doc.data().thumbnail,
+        videoId: doc.data().videoId ?? '',
+        title: doc.data().title ?? '',
+        thumbnail: doc.data().thumbnail ?? '',
         favorited: doc.data().favorited ?? false,
         description: doc.data().description ?? '',
         location: doc.data().location ?? '',
@@ -39,13 +38,13 @@ export function useFavorites() {
 
     try {
       await addDoc(collection(db, `users/${user.uid}/favorites`), {
-        id: video.videoId,
-        title: video.title,
-        thumbnail: video.thumbnail,
+        videoId: video.videoId ?? '',
+        title: video.title ?? '',
+        thumbnail: video.thumbnail ?? '',
         favorited: true,
-        description: video.description,
-        location: video.location,
-        position: video.position
+        description: video.description ?? '',
+        location: video.location ?? '',
+        position: video.position ?? [0, 0]
       });
 
       await fetchFavorites();
@@ -85,14 +84,13 @@ export function useFavorites() {
       collection(db, `users/${auth.currentUser?.uid}/favorites`),
       (snapshot) => {
         favorites.value = snapshot.docs.map(doc => ({
-          id: doc.id,
-          videoId: doc.id,
-          title: doc.data().title,
-          thumbnail: doc.data().thumbnail,
+          videoId: doc.data().videoId ?? '',
+          title: doc.data().title ?? '',
+          thumbnail: doc.data().thumbnail ?? '',
           favorited: true,
-          description: doc.data().description,
-          location: doc.data().location,
-          position: doc.data().position,
+          description: doc.data().description ?? '',
+          location: doc.data().location ?? '',
+          position: doc.data().position ?? [0, 0],
         })) as VideoMarker[];
       },
       (err) => {

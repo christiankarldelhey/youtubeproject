@@ -80,14 +80,14 @@ export function useYoutube() {
         const detailedVideo = detailedVideos.find(video => video.id === item.id.videoId);
         return {
           position: [
-            detailedVideo?.recordingDetails?.location?.latitude,
-            detailedVideo?.recordingDetails?.location?.longitude
+            detailedVideo?.recordingDetails?.location?.latitude ?? 0,
+            detailedVideo?.recordingDetails?.location?.longitude ?? 0
           ],
           location: detailedVideo?.recordingDetails?.locationDescription,
-          title: detailedVideo?.snippet.title,
-          description: detailedVideo?.snippet.description,
-          videoId: detailedVideo?.id,
-          thumbnail: detailedVideo?.snippet.thumbnails.high.url,
+          title: detailedVideo?.snippet.title ?? '',
+          description: detailedVideo?.snippet.description ?? '',
+          videoId: detailedVideo?.id ?? '',
+          thumbnail: detailedVideo?.snippet.thumbnails.high.url ?? '',
         };
       });
 
