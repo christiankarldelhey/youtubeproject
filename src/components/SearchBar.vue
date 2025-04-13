@@ -63,7 +63,13 @@ watch(term, (newVal) => {
     class="fixed top-5 flex items-center z-9999"
     :class="user ? 'right-16' : 'right-48'"
     >
-      <div class="relative w-full bg-white rounded shadow-lg">
+    <Button
+            @click="manageSettingsDialog(true)"
+            class="flex items-center gap-2 w-full p-2 mr-2 rounded-md transition-colors
+                    cursor-pointer bg-white text-primary hover:bg-white h-9 w-9" >
+            <component :is="iconMap[mapStore.searchQuery.icon as keyof typeof iconMap]" />
+        </Button>
+      <div class="relative rounded-md bg-white">
         <PopoverTrigger as-child>
           <Input 
             v-model="term"
@@ -80,12 +86,6 @@ watch(term, (newVal) => {
             <MapPin class="h-4 w-4 text-muted-foreground" />
           </span>
         </div>
-        <Button
-            @click="manageSettingsDialog(true)"
-            class="flex items-center gap-2 w-full p-2 ml-2 rounded-md transition-colors
-                    cursor-pointer bg-white text-primary hover:bg-white" >
-            <component :is="iconMap[mapStore.searchQuery.icon as keyof typeof iconMap]" />
-        </Button>
         <PopoverContent 
           v-if="autocompleteResults && autocompleteResults.length > 0" 
           class="w-80 bg-white rounded shadow-lg z-9999"

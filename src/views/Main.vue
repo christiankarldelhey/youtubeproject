@@ -49,6 +49,7 @@
     @handle-sidebar="handleSidebar"
     :favorites="favorites"
     :videos="videos" />
+    <!--Search Button-->
     <Button 
       v-if="mapStore.showSearchButton"
       @click="fetchVideos(currentMapPosition, currentZoom)" 
@@ -59,6 +60,7 @@
         class="w-2 h-2" /> 
           Videos in this area
     </Button>
+    <!--User Options-->
     <UserOptions 
       :user="user" 
       class="z-9999" />

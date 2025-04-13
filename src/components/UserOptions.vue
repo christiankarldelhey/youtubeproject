@@ -37,7 +37,7 @@ const emit = defineEmits(['close']);
     <DropdownMenu>
       <DropdownMenuTrigger as-child>
       <Button
-          class="absolute z-9999 px-2 right-1 top-5 flex items-center rounded-md
+          class="absolute z-9999 px-2 right-3 top-5 flex items-center rounded-md
                     cursor-pointer bg-white text-primary hover:bg-white" >
           <User class="" />
         </Button>

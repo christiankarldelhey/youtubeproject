@@ -1,4 +1,4 @@
-import { Utensils, Bed, Tent, CircleDollarSign, MapIcon } from 'lucide-vue-next';
+import { Utensils, Bed, Tent, CircleDollarSign, MapIcon, Scroll } from 'lucide-vue-next';
 
 export function useSearchSettings() {
 
@@ -8,6 +8,7 @@ export function useSearchSettings() {
         Bed,
         Tent,
         CircleDollarSign,
+        Scroll,
     };
 
     const searchOptions = [
@@ -16,6 +17,7 @@ export function useSearchSettings() {
         { value: 'hotel', label: 'Accomodation', icon: 'Bed' },
         { value: 'hiking', label: 'Hiking (Outdoors)', icon: 'Tent' },
         { value: 'budget', label: 'Travel on a budget', icon: 'CircleDollarSign' },
+        { value: 'history', label: 'History', icon: 'Scroll' },
       ];
 
     return {
