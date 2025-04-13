@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { Input } from '@/components/ui/input';
-import { List, HeartIcon, MapPin } from "lucide-vue-next";
+import { MapPin } from "lucide-vue-next";
 import { useSearchLocation } from '../composables/useSearchLocation';
 import type { GeoFeature } from '../composables/useSearchLocation';
 import {

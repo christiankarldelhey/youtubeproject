@@ -4,10 +4,7 @@ import { Card } from "@/components/ui/card";
 import { useFavorites } from '../composables/useFavorites';
 import { HeartIcon } from "lucide-vue-next";
 import { useMapStore } from '../store/mapStore';
-import { useToast } from "@/components/ui/toast";
 import { ref } from 'vue';
-
-const { toast } = useToast();
 
 const mapStore = useMapStore();
 const selectedVideo = ref(mapStore.selectedPin);

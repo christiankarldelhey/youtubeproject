@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useSidebar } from "@/components/ui/sidebar/utils";
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
 import VideoList from './VideoList.vue';
 import { useMapStore } from '../store/mapStore';
 import { useMobile } from '../composables/useMobile';
