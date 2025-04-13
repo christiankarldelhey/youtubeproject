@@ -11,34 +11,7 @@ const { toast } = useToast();
 
 const mapStore = useMapStore();
 const selectedVideo = ref(mapStore.selectedPin);
-const { favorites, removeFavorite, addFavorite } = useFavorites();
-
-const toggleFavorite = async () => {
-  if (!selectedVideo.value) return;
-
-  const isFavorite = favorites.value.some(fav => fav.videoId === selectedVideo.value?.videoId);
-
-  if (!isFavorite) {
-    selectedVideo.value.favorited = true;
-    await addFavorite(selectedVideo.value!);
-    console.log('agrega favorite?');
-    toast({
-      title: "Added to favorites",
-      description: `"${selectedVideo.value.title}" was added to your favorites.`,
-    });
-  } else {
-    console.log('saca favorite?');
-    selectedVideo.value.favorited = false;
-    await removeFavorite(selectedVideo.value.videoId);
-
-    toast({
-      title: "Removed from favorites",
-      description: `"${selectedVideo.value.title}" was removed from your favorites.`,
-    });
-  }
-};
-
-
+const { toggleFavorite } = useFavorites();
 
 const closeDialog = () => {
     mapStore.setDialogOpen(false);
@@ -62,7 +35,7 @@ const closeDialog = () => {
                     <HeartIcon 
                     class="h-6 w-6 cursor-pointer transition-colors duration-200" 
                     :class="{ 'fill-red-500 text-red-500': selectedVideo?.favorited }"
-                    @click="toggleFavorite" />
+                    @click="toggleFavorite(selectedVideo!)" />
                     <DialogTitle class="pt-1">
                         {{ selectedVideo?.title }}
                     </DialogTitle>

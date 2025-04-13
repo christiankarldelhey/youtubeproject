@@ -25,4 +25,10 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%
   }
+  .mobile-sheet ~ [data-state="open"].fixed.inset-0 {
+    background-color: transparent !important;
+    pointer-events: none !important;
+  }
 }
+
+

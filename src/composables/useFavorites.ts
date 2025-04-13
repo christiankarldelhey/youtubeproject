@@ -2,6 +2,7 @@ import { ref, onUnmounted } from 'vue';
 import { db, auth } from "../firebase";
 import { collection, addDoc, deleteDoc, doc, onSnapshot, getDocs } from "firebase/firestore";
 import type { VideoMarker } from '../types/Map';
+import { toast } from '@/components/ui/toast'; // Assuming you're using a toast composable/component
 
 const favorites = ref<VideoMarker[]>([]);
 const loading = ref(false);
@@ -26,7 +27,6 @@ export function useFavorites() {
         location: doc.data().location ?? '',
         position: doc.data().position ?? [0, 0],
       })) as VideoMarker[];
-      console.log('new favorites', favorites.value);
     } catch (err) {
       error.value = err as Error;
       console.error("Error fetching favorites:", err);
@@ -72,6 +72,27 @@ export function useFavorites() {
     }
   };
 
+  const toggleFavorite = async (video: VideoMarker) => {
+    if (!video) return;
+    const isFavorite = favorites.value.some(fav => fav.videoId === video.videoId);
+
+    if (!isFavorite) {
+      video.favorited = true;
+      await addFavorite(video);
+      toast({
+        title: "Added to favorites",
+        description: `"${video.title}" was added to your favorites.`,
+      });
+    } else {
+      video.favorited = false;
+      await removeFavorite(video.videoId);
+      toast({
+        title: "Removed from favorites",
+        description: `"${video.title}" was removed from your favorites.`,
+      });
+    }
+  };
+
   if (!hasInitialized) {
     hasInitialized = true;
 
@@ -112,6 +133,7 @@ export function useFavorites() {
     error,
     addFavorite,
     removeFavorite,
-    fetchFavorites
+    fetchFavorites,
+    toggleFavorite // 👈 Reusable function
   };
 }

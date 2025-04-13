@@ -4,10 +4,12 @@ import { useMapStore } from '../store/mapStore';
 import { removeEmojisAndUppercaseWords } from '@/utils/utils.ts';
 import type { VideoMarker } from '../types/Map';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useMobile } from '../composables/useMobile';
 import { ChevronUpIcon, ChevronDownIcon, MapPin } from 'lucide-vue-next';
 
 const props = defineProps<{ videos: VideoMarker[] }>();
 
+const { isMobile } = useMobile();
 const mapStore = useMapStore();
 const collapsedLocations = ref<Record<string, boolean>>({});
 
@@ -31,7 +33,7 @@ const toggleCollapse = (location: string) => {
 };
 
 const openVideo = (video: VideoMarker) => {
-  mapStore.setDialogOpen(true);
+  !isMobile ? mapStore.setDialogOpen(true) : mapStore.setSelectedOption('video-detail');
   mapStore.selectPin(video);
 };
 
@@ -45,7 +47,7 @@ const openVideo = (video: VideoMarker) => {
 
 <template>
     <div class="p-4 text-primary" v-if="videos.length === 0">
-        No videos found. Please explore a location and click on the search videos button. 
+        No videos found. Please explore a new location and click on the search videos button. 
     </div>
     <div v-else v-for="group in groupedVideoMarkers" :key="group.location">
         <div 

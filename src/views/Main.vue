@@ -13,9 +13,12 @@
   import { Button } from '@/components/ui/button';
   import UserOptions from '../components/UserOptions.vue';
   import { useSearchSettings } from '../composables/useSearchSettings';
+  import MobileOptions from '../components/MobileOptions.vue';
+  import { useMobile } from '../composables/useMobile';
   import { Toaster } from '@/components/ui/toast'
 
   const { iconMap } = useSearchSettings();
+  const { isMobile } = useMobile();
 
   const mapStore = useMapStore();
   const selectedOption = ref('none');
@@ -28,12 +31,6 @@
   const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
   const { videos, fetchYoutubeVideos } = useYoutube();
 
-  const sidebarOpen = ref(false);
-  const handleSidebar = (open: boolean, option: string) => {  
-    sidebarOpen.value = open;
-    selectedOption.value = option;
-  }
-
   const fetchVideos = (currentMapPosition: center, currentZoom: zoom) => {
     fetchYoutubeVideos({ apiKey, currentMapPosition, currentZoom, searchQuery: mapStore.searchQuery.value });
     mapStore.setShowSearchButton(false);
@@ -42,13 +39,14 @@
 
 <template>
   <SidebarProvider 
-    :open="sidebarOpen"
-    :defaultOpen="false" 
-    style="--sidebar-width: 35rem;">
+      :open="!isMobile && mapStore.selectedOption !== 'none'"
+      :defaultOpen="false" 
+      style="--sidebar-width: 35rem;">
    <VideoSidebar 
-    @handle-sidebar="handleSidebar"
-    :favorites="favorites"
-    :videos="videos" />
+      :favorites="favorites"
+      :videos="videos" />
+    <MobileOptions 
+      v-if="isMobile"  />
     <!--Search Button-->
     <Button 
       v-if="mapStore.showSearchButton"
@@ -90,5 +88,10 @@ div[data-aria-hidden = true][data-state="open"] {
 :deep(.toast-root),
 :deep(.toaster) {
   z-index: 100000 !important;
+}
+
+:deep(.inset-0) {
+  background-color: transparent !important;
+  pointer-events: none;
 }
 </style>   

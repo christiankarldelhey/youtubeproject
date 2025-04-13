@@ -16,7 +16,10 @@ import {
 } from 'lucide-vue-next'
 import LoginDialog from './LoginDialog.vue';
 import type { User as UserType } from "firebase/auth";
+import { useMobile } from '../composables/useMobile';
 import { ref } from 'vue';
+
+const { isMobile } = useMobile();
 
 const props = defineProps<{ user: UserType | null }>();
 
@@ -37,9 +40,9 @@ const emit = defineEmits(['close']);
     <DropdownMenu>
       <DropdownMenuTrigger as-child>
       <Button
-          class="absolute z-9999 px-2 right-3 top-5 flex items-center rounded-md
+          class="absolute z-9999 px-2 right-3 top-4 flex h-10 w-10 items-center rounded-full
                     cursor-pointer bg-white text-primary hover:bg-white" >
-          <User class="" />
+          <User class="h-6 w-6" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent class="mr-4 mt-2 w-48 z-9999 bg-background ">
@@ -61,7 +64,9 @@ const emit = defineEmits(['close']);
   </template>
 
   <template v-else>
-    <div class="absolute z-9999 right-5 top-5">
+    <div 
+    class="absolute z-9999 top-5" 
+    :class="isMobile ? 'left-0' : 'right-5'">
       <div class="flex flex-row justify-between gap-1">
         <Button 
         variant="default"

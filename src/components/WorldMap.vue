@@ -5,6 +5,7 @@ import 'leaflet.markercluster';
 import { LMarkerClusterGroup } from 'vue-leaflet-markercluster'
 import { ref, watch, onMounted } from 'vue';
 import { useMap } from '../composables/useMap';
+import { useMobile } from '../composables/useMobile';
 import { MapPin } from 'lucide-vue-next';
 import { Progress } from '@/components/ui/progress'
 import type { VideoMarker } from '../types/Map';
@@ -15,6 +16,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(['fetch-videos']);
+const { isMobile } = useMobile();
 
 const mapStore = useMapStore();
 const { initializeLeaflet, getUserLocation, mapsList, heartIcon, defaultIcon } = useMap();
@@ -66,6 +68,7 @@ watch(
 
 const selectVideo = (video: VideoMarker) => {
   mapStore.selectPin(video);
+  if (isMobile.value) mapStore.setSelectedOption('video-detail');
 }
 
 const openVideo = () => {
@@ -107,15 +110,18 @@ onMounted(async () => {
       name="map"
     />
     
-    <l-marker-cluster-group :key="videos.length + JSON.stringify(videos.map(v => v.videoId))">
+    <l-marker-cluster-group 
+      :key="videos.length + JSON.stringify(videos.map(v => v.videoId))">
       <l-marker 
         v-for="marker in props.videos"
         :key="marker.videoId"
         :lat-lng="marker.position ?? mapStore.center"
         :icon="getMarkerIcon(marker)"
+        
         @click="selectVideo(marker)">
         
         <l-popup 
+          v-if="!isMobile"
           @click="openVideo()" 
           class="relative cursor-pointer z-9999"> 
           <span class="z-9999 text-primary flex flex-row mb-2">

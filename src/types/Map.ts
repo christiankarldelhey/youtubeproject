@@ -68,6 +68,7 @@ export interface VideoSnippet {
     favoriteVideos?: VideoMarker[];
     showSearchButton: boolean;
     searchQuery: SearchOption;
+    selectedOption: string;
     flyToTarget: { center: center; zoom?: zoom, bbox?: bbox } | null;
   };
   

@@ -9,9 +9,13 @@ export const useMapStore = defineStore('map', {
     flyToTarget: null as { center: center; zoom?: zoom, bbox?: bbox } | null,
     dialogOpen: false,
     showSearchButton: false,
-    searchQuery: { value: 'travel', label: 'Travel (general travel videos)', icon: 'MapIcon' },
+    selectedOption: 'none',
+    searchQuery: { value: 'travel', label: 'Travel', icon: 'MapIcon' },
   }) as MapStoreState,
   actions: {
+    setSelectedOption(option: string): void {
+      this.selectedOption = option;
+    },
     setSearchQuery(query: SearchOption): void {
       this.searchQuery = query;
     },
@@ -37,6 +41,7 @@ export const useMapStore = defineStore('map', {
       this.flyToTarget = null;
     },
     clearSelectedPin() {
+      console.log('clearing selected pin');
       this.selectedPin = null;
     },
   },

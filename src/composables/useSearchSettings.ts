@@ -12,7 +12,7 @@ export function useSearchSettings() {
     };
 
     const searchOptions = [
-        { value: 'travel', label: 'Travel (general travel videos)', icon: 'MapIcon' },
+        { value: 'travel', label: 'Travel', icon: 'MapIcon' },
         { value: 'food', label: 'Gastronomy', icon: 'Utensils' },
         { value: 'hotel', label: 'Accomodation', icon: 'Bed' },
         { value: 'hiking', label: 'Hiking (Outdoors)', icon: 'Tent' },
