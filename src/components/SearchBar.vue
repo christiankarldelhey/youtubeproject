@@ -63,7 +63,7 @@ watch(term, (newVal) => {
   <Popover v-model:open="isPopoverOpen">
     <div
     class="fixed top-5 flex items-center z-9999"
-    :class="user ? 'right-16' : 'right-48'"
+    :class="isMobile ? 'left-2' : 'right-16'"
     >
       <Button
             @click="manageSettingsDialog(true)"

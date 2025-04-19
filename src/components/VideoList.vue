@@ -5,9 +5,11 @@ import { removeEmojisAndUppercaseWords } from '@/utils/utils.ts';
 import type { VideoMarker } from '../types/Map';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useMobile } from '../composables/useMobile';
+import { useAuth } from '../composables/useAuth';
 import { ChevronUpIcon, ChevronDownIcon, MapPin } from 'lucide-vue-next';
 
 const props = defineProps<{ videos: VideoMarker[] }>();
+const { user } = useAuth();
 
 const { isMobile } = useMobile();
 const mapStore = useMapStore();
@@ -47,8 +49,10 @@ const openVideo = (video: VideoMarker) => {
 </script>
 
 <template>
-    <div class="p-4 text-primary" v-if="videos.length === 0">
-        No videos found. Please explore a new location and click on the search videos button. 
+    <div class="p-2 text-primary" v-if="videos.length === 0">
+      <p v-if="mapStore.selectedOption.value === 'search'" class="text-sm">No videos found. Please explore a new location and click on the search videos button.</p> 
+      <p v-if="mapStore.selectedOption.value === 'favorites' && user" class="text-sm">You dont have any favorited video yet.</p>
+      <p v-if="mapStore.selectedOption.value === 'favorites' && !user" class="text-sm">You cannot favorite videos if you are not logged in.</p>
     </div>
     <div v-else v-for="group in groupedVideoMarkers" :key="group.location">
         <div 

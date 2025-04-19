@@ -46,24 +46,12 @@
    <VideoSidebar 
       :favorites="favorites"
       :videos="videos" />
-    <MobileOptions 
-      v-if="isMobile"  />
-    <!--Search Button-->
-    <Button 
-      v-if="mapStore.showSearchButton"
-      @click="fetchVideos(currentMapPosition, currentZoom)" 
-      variant="secondary"
-      class="absolute z-9999 left-1/2 top-24 transform -translate-x-1/2 border text-sm">
-      <component 
-        :is="iconMap[mapStore.searchQuery.icon as keyof typeof iconMap]" 
-        class="w-2 h-2" /> 
-          Videos in this area
-    </Button>
-    <!--User Options-->
+
     <UserOptions 
       :user="user" 
       class="z-9999" />
     <SearchBar @fetch-videos="fetchVideos(currentMapPosition, currentZoom)" />
+
     <div class="flex flex-col w-full">
         <WorldMap 
           :videos="mapStore.selectedOption.value === 'favorites' ? favorites : videos" 
@@ -84,7 +72,22 @@
       @update:open="mapStore.setSelectedOption(mapStore.selectedOption.value, false)"
       :favorites="favorites"
       :videos="videos" />
+
+        <!--Search Button este anda-->
+    <Button 
+      v-if="mapStore.showSearchButton"
+      @click="fetchVideos(currentMapPosition, currentZoom)" 
+      variant="secondary"
+      class="absolute z-9999 left-1/2 top-24 transform -translate-x-1/2 border text-sm">
+      <component 
+        :is="iconMap[mapStore.searchQuery.icon as keyof typeof iconMap]" 
+        class="w-2 h-2" /> 
+          Videos in this area
+    </Button>
   </SidebarProvider>
+  <div class="fixed bottom-0 p-2 w-full bg-gray-200 h-14 z-100001">
+    <MobileOptions v-if="isMobile"  />
+  </div>
   <Toaster />
 </template>
 

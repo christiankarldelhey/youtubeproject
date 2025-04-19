@@ -18,7 +18,6 @@
   
   </script>
   
-  
   <template>
     <!-- Mobile view -->
     <div class="block md:hidden mobile-sheet">
@@ -26,7 +25,7 @@
             class="bg-background" 
             :open="props.open" 
             @update:open="$emit('update:open')">
-        <SheetContent side="bottom" class="h-[55vh] p-0 w-full bg-background overflow-y-auto overflow-x-hidden">
+        <SheetContent side="bottom" class="h-[55vh] mb-12 p-0 w-full bg-background overflow-y-auto overflow-x-hidden">
             <SheetHeader class="p-4 border-b sticky top-0 bg-background z-10">
             <div class="flex items-center justify-between w-full">
                 <div v-if="mapStore.selectedOption.value === 'search'" class="text-primary text-sm truncate">

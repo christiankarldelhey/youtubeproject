@@ -26,11 +26,10 @@ module.exports = {
 			background: '#f2f3f1', // Very light gray (for background elements)
 			foreground: '#c3c9cc', // Soft gray-blue (for text & UI elements)
   		},
-		  zIndex: {
-			9998: '9998',
-		},
 		zIndex: {
+			9998: '9998',
 			9999: '9999',
+			100001: '100001'
 		},
   	}
   },

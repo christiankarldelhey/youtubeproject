@@ -11,12 +11,6 @@
   const mapStore = useMapStore();
   const props = defineProps<{ open: boolean }>();
   
-//   watch(() => props.videos, (newVideos) => {
-//     if (newVideos.length > 0) {
-//       mapStore.setSelectedOption('search');
-//     }
-//   }, { deep: true });
-  
   </script>
   
   

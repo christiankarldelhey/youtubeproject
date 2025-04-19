@@ -38,7 +38,13 @@ const moveMapCenter = () => {
 };
 
 const onMapReady = () => {
-  mapRef.value.leafletObject?.zoomControl.setPosition('bottomright');
+  const map = mapRef.value.leafletObject;
+  if (!map) return;
+  if (!isMobile) {
+    map.zoomControl.setPosition('bottomright');
+  } else {
+    map.removeControl(map.zoomControl);
+  }
 };
 
 watch(
