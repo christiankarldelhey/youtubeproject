@@ -11,15 +11,15 @@ const mapStore = useMapStore();
     <div class="fixed top-5 left-3 z-9999">
         <div class="flex flex-col gap-2">
             <Button
-            @click="mapStore.setSelectedOption('search')"
-            :class="{ 'bg-primary/30': mapStore.selectedOption === 'search' }"
+            @click="mapStore.setSelectedOption('search', true)"
+            :class="{ 'active': mapStore.selectedOption.value === 'search' }"
             class="flex items-center gap-2 w-full p-2 mr-2 rounded-md transition-colors
                         cursor-pointer bg-white text-primary hover:bg-white h-9 w-9" >
                 <List />
             </Button>
             <Button
-            @click="mapStore.setSelectedOption('favorites')"
-            :class="{ 'bg-primary/30': mapStore.selectedOption === 'favorites' }"
+            @click="mapStore.setSelectedOption('favorites', true)"
+            :class="{ 'active': mapStore.selectedOption.value === 'favorites' }"
             class="flex items-center gap-2 w-full p-2 mr-2 rounded-md transition-colors
                         cursor-pointer bg-white text-primary hover:bg-white h-9 w-9" >
                 <HeartIcon />
@@ -27,3 +27,10 @@ const mapStore = useMapStore();
       </div>
     </div>
   </template>
+
+  <style scoped>
+    .active {
+      background-color: #d47b54;
+      color: white;
+    }
+  </style>

@@ -2,7 +2,7 @@ import { ref, onUnmounted } from 'vue';
 import { db, auth } from "../firebase";
 import { collection, addDoc, deleteDoc, doc, onSnapshot, getDocs } from "firebase/firestore";
 import type { VideoMarker } from '../types/Map';
-import { toast } from '@/components/ui/toast'; // Assuming you're using a toast composable/component
+import { toast } from '@/components/ui/toast';
 
 const favorites = ref<VideoMarker[]>([]);
 const loading = ref(false);
@@ -134,6 +134,6 @@ export function useFavorites() {
     addFavorite,
     removeFavorite,
     fetchFavorites,
-    toggleFavorite // 👈 Reusable function
+    toggleFavorite
   };
 }

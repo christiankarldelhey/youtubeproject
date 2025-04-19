@@ -68,7 +68,9 @@ watch(
 
 const selectVideo = (video: VideoMarker) => {
   mapStore.selectPin(video);
-  if (isMobile.value) mapStore.setSelectedOption('video-detail');
+  console.log('isMobile', isMobile.value);
+  console.log('selectedPin', mapStore.selectedPin);
+  if (isMobile.value) mapStore.setMobileVideoDetail(true);
 }
 
 const openVideo = () => {
@@ -112,16 +114,23 @@ onMounted(async () => {
     
     <l-marker-cluster-group 
       :key="videos.length + JSON.stringify(videos.map(v => v.videoId))">
-      <l-marker 
+      <template v-if="isMobile">
+        <l-marker 
+          v-for="marker in props.videos"
+          :key="marker.videoId"
+          :lat-lng="marker.position ?? mapStore.center"
+          :icon="getMarkerIcon(marker)"
+          @click="selectVideo(marker)"
+        ></l-marker>
+      </template>
+      <template v-else>
+        <l-marker 
         v-for="marker in props.videos"
         :key="marker.videoId"
         :lat-lng="marker.position ?? mapStore.center"
         :icon="getMarkerIcon(marker)"
-        
         @click="selectVideo(marker)">
-        
         <l-popup 
-          v-if="!isMobile"
           @click="openVideo()" 
           class="relative cursor-pointer z-9999"> 
           <span class="z-9999 text-primary flex flex-row mb-2">
@@ -136,6 +145,7 @@ onMounted(async () => {
           <p>{{ marker.title }}</p>
         </l-popup>
       </l-marker>
+      </template>
     </l-marker-cluster-group>
 
   </l-map>

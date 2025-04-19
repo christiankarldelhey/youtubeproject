@@ -36,7 +36,6 @@ const emit = defineEmits(['close']);
 </script>
 
 <template>
-  <template v-if="props.user">
     <DropdownMenu>
       <DropdownMenuTrigger as-child>
       <Button
@@ -46,43 +45,33 @@ const emit = defineEmits(['close']);
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent class="mr-4 mt-2 w-48 z-9999 bg-background ">
-        <DropdownMenuLabel>{{ user?.email }}</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem @click="">
-            <Settings class="mr-2 h-4 w-4" />
+        <template v-if="props.user">
+          <DropdownMenuLabel>{{ props.user?.email }}</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem @click="">
+              <Settings class="mr-2 h-4 w-4" />
             <span>Settings</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator v-if="props.user" />
         <DropdownMenuItem>
           <LogOut class="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>
+        </template>
+        <template v-else>
+          <DropdownMenuGroup>
+            <DropdownMenuItem @click="manageLoginDialog(true, 'Login')">
+              Login
+            </DropdownMenuItem>
+            <DropdownMenuItem @click="manageLoginDialog(true, 'Sign up')">
+              Sign Up
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </template>
       </DropdownMenuContent>
     </DropdownMenu>
-  </template>
-
-  <template v-else>
-    <div 
-    class="absolute z-9999 top-5" 
-    :class="isMobile ? 'left-0' : 'right-5'">
-      <div class="flex flex-row justify-between gap-1">
-        <Button 
-        variant="default"
-        @click="manageLoginDialog(true, 'Login')" 
-        class="border text-sm bg-white text-primary border cursor-pointer">
-        Login
-      </Button>
-      <Button 
-        variant="default"
-        @click="manageLoginDialog(true, 'Sign up')" 
-        class="border text-sm bg-white text-primary border cursor-pointer">
-        Sign Up
-      </Button>
-      </div>
-    </div>
-  </template>
   <LoginDialog 
     :open="loginDialogOpen" 
     @close="manageLoginDialog(false, 'Login')"

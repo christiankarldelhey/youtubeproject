@@ -33,7 +33,8 @@ const toggleCollapse = (location: string) => {
 };
 
 const openVideo = (video: VideoMarker) => {
-  !isMobile ? mapStore.setDialogOpen(true) : mapStore.setSelectedOption('video-detail');
+  !isMobile.value ? mapStore.setDialogOpen(true) : 
+  mapStore.setMobileVideoDetail(true);
   mapStore.selectPin(video);
 };
 

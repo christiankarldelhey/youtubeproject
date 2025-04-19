@@ -13,13 +13,13 @@ const mapStore = useMapStore();
 
 const saveSettings = () => {
   const selectedObject = searchOptions.find(option => 
-    option.value === selectedOption.value);
+    option.value === searchQuery.value);
     mapStore.setSearchQuery(selectedObject!);
     emit('close');
     mapStore.setShowSearchButton(true);
 };
 
-const selectedOption = ref(mapStore.searchQuery.value);
+const searchQuery = ref(mapStore.searchQuery.value);
 const props = defineProps<{ open: boolean }>();
 
 const emit = defineEmits(['close']);
@@ -36,7 +36,7 @@ const emit = defineEmits(['close']);
                     class="absolute top-2 right-2 cursor-pointer text-gray-500 hover:text-gray-800">
                 </DialogClose>
             </DialogHeader>
-            <RadioGroup v-model="selectedOption" class="mt-5">
+            <RadioGroup v-model="searchQuery" class="mt-5">
                 <div v-for="option in searchOptions" class="flex flex-row" :key="option.value">
                     <Component :is="iconMap[option.icon as keyof typeof iconMap]" class="mr-2 h-5 w-5" />
                     <RadioGroupItem class="h-5 w-5" :value="option.value" :id="option.value" />

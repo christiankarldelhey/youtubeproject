@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, computed } from 'vue';
+  import { computed } from 'vue';
   import SearchBar from '../components/SearchBar.vue';
   import WorldMap from '../components/WorldMap.vue';
   import { useYoutube } from '../composables/useYouTube';
@@ -14,6 +14,8 @@
   import UserOptions from '../components/UserOptions.vue';
   import { useSearchSettings } from '../composables/useSearchSettings';
   import MobileOptions from '../components/MobileOptions.vue';
+  import MobileMenu from '../components/MobileMenu.vue';
+  import MobileVideoDetail from '../components/MobileVideoDetail.vue';
   import { useMobile } from '../composables/useMobile';
   import { Toaster } from '@/components/ui/toast'
 
@@ -21,7 +23,6 @@
   const { isMobile } = useMobile();
 
   const mapStore = useMapStore();
-  const selectedOption = ref('none');
   const { favorites } = useFavorites();
   const { user } = useAuth();
 
@@ -39,7 +40,7 @@
 
 <template>
   <SidebarProvider 
-      :open="!isMobile && mapStore.selectedOption !== 'none'"
+      :open="!isMobile && mapStore.selectedOption.expanded"
       :defaultOpen="false" 
       style="--sidebar-width: 35rem;">
    <VideoSidebar 
@@ -65,13 +66,24 @@
     <SearchBar @fetch-videos="fetchVideos(currentMapPosition, currentZoom)" />
     <div class="flex flex-col w-full">
         <WorldMap 
-          :videos="selectedOption === 'favorites' ? favorites : videos" 
+          :videos="mapStore.selectedOption.value === 'favorites' ? favorites : videos" 
           @fetch-videos="fetchVideos(currentMapPosition, currentZoom)"
           />
     </div>
     <VideoDialog
-      v-if="mapStore.selectedPin && mapStore.dialogOpen"
+      v-if="!isMobile && mapStore.selectedPin && mapStore.dialogOpen"
       :open="mapStore.dialogOpen" />
+    <MobileVideoDetail 
+      v-if="isMobile && mapStore.showMobileVideoDetail"
+      :open="mapStore.showMobileVideoDetail"
+      @update:open="mapStore.setMobileVideoDetail(false)"
+      />
+    <MobileMenu 
+      v-if="isMobile"
+      :open="mapStore.selectedOption.expanded"
+      @update:open="mapStore.setSelectedOption(mapStore.selectedOption.value, false)"
+      :favorites="favorites"
+      :videos="videos" />
   </SidebarProvider>
   <Toaster />
 </template>
@@ -83,15 +95,5 @@ div[role="dialog"][data-state="open"] {
 }
 div[data-aria-hidden = true][data-state="open"] {
   z-index: 9999 !important;
-}
-
-:deep(.toast-root),
-:deep(.toaster) {
-  z-index: 100000 !important;
-}
-
-:deep(.inset-0) {
-  background-color: transparent !important;
-  pointer-events: none;
 }
 </style>   
