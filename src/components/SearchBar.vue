@@ -12,13 +12,11 @@ import {
 import type { center, bbox } from '../types/Map';
 import { useMapStore } from '../store/mapStore';
 import SearchSettingsDialog from './SearchSettingsDialog.vue';
-import { useAuth } from '../composables/useAuth';
 import { useSearchSettings } from '../composables/useSearchSettings';
 import { useMobile } from '../composables/useMobile';
 import { Button } from '@/components/ui/button';
 
 const { isMobile } = useMobile();
-const { user } = useAuth();
 const { iconMap } = useSearchSettings();
 const mapStore = useMapStore();
 
