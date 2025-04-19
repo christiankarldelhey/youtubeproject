@@ -5,10 +5,8 @@
   import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
   import VideoList from './VideoList.vue';
   import { useMapStore } from '../store/mapStore';
-  import { useFavorites } from '../composables/useFavorites';
   import type { VideoMarker } from "../types/Map";
-  
-  const { toggleFavorite } = useFavorites();
+
   const mapStore = useMapStore();
   const props = defineProps<{ videos: VideoMarker[]; favorites: VideoMarker[]; open: boolean }>();
   

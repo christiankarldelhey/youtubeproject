@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import VideoList from './VideoList.vue';
 import { useMapStore } from '../store/mapStore';
 import { useMobile } from '../composables/useMobile';
-import { useFavorites } from '../composables/useFavorites';
 import type { VideoMarker } from "../types/Map";
 
 const mapStore = useMapStore();

@@ -16,10 +16,7 @@ import {
 } from 'lucide-vue-next'
 import LoginDialog from './LoginDialog.vue';
 import type { User as UserType } from "firebase/auth";
-import { useMobile } from '../composables/useMobile';
 import { ref } from 'vue';
-
-const { isMobile } = useMobile();
 
 const props = defineProps<{ user: UserType | null }>();
 
