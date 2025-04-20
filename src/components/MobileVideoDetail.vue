@@ -65,9 +65,3 @@
         </Sheet>
     </div>
 </template>
-
-<style>
-  [data-state="open"].bg-black\/80 {
-    background-color: transparent;
-  }
-</style>

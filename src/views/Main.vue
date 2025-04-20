@@ -85,13 +85,16 @@
           Videos in this area
     </Button>
   </SidebarProvider>
-  <div class="fixed bottom-0 p-2 w-full bg-gray-200 h-14 z-100001">
-    <MobileOptions v-if="isMobile"  />
+  <div v-if="isMobile" class="fixed bottom-0 p-2 w-full bg-gray-200 h-14 z-100001">
+    <MobileOptions />
   </div>
   <Toaster />
 </template>
 
 <style>
+  .is-mobile [data-state="open"].bg-black\/80 {
+    background-color: transparent;
+  }
 div[role="dialog"][data-state="open"] {
     z-index: 100000 !important;
     position: fixed !important;
