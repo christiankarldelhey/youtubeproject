@@ -21,7 +21,7 @@
             class="bg-background" 
             :open="props.open" 
             @update:open="$emit('update:open')">
-        <SheetContent side="bottom" class="h-[55vh] p-0 w-full bg-background overflow-y-auto overflow-x-hidden">
+        <SheetContent side="bottom" class="h-[55vh] p-0 mb-12 w-full bg-background overflow-y-auto overflow-x-hidden">
             <SheetHeader class="p-4 border-b sticky top-0 bg-background z-10">
             <div class="flex items-center justify-between w-full">
                 <div 

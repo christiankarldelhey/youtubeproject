@@ -3,7 +3,8 @@ import {
   sendSignInLinkToEmail, 
   signInWithEmailLink, 
   isSignInWithEmailLink, 
-  onAuthStateChanged 
+  onAuthStateChanged,
+  signOut 
 } from "firebase/auth";
 import { auth } from "../firebase";
 import type { User } from "firebase/auth";
@@ -14,6 +15,11 @@ onAuthStateChanged(auth, (firebaseUser) => {
   user.value = firebaseUser;
   console.log('Auth state changed:', user.value);
 });
+
+const logout = async () => {
+  await signOut(auth);
+  user.value = null;
+};
 
 export function useAuth() {
   const userEmail = ref(localStorage.getItem('emailForSignIn') || '');
@@ -40,5 +46,5 @@ export function useAuth() {
     return null;
   };
 
-  return { user, sendLoginLink, completeSignIn };
+  return { user, sendLoginLink, completeSignIn, logout };
 }

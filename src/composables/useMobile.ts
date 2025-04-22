@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 
 export function useMobile() {
   const isMobile = ref(false);
@@ -17,6 +17,11 @@ export function useMobile() {
   onUnmounted(() => {
     mediaQueryList.removeEventListener('change', updateIsMobile);
   });
+
+  watch(isMobile, (value) => {
+    document.body.classList.toggle('is-mobile', value);
+    document.body.classList.toggle('is-desktop', !value);
+  }, { immediate: true });
 
   return { isMobile };
 }

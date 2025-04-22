@@ -17,7 +17,8 @@
   import MobileMenu from '../components/MobileMenu.vue';
   import MobileVideoDetail from '../components/MobileVideoDetail.vue';
   import { useMobile } from '../composables/useMobile';
-  import { Toaster } from '@/components/ui/toast'
+  import { Toaster } from '@/components/ui/toast';
+  import strings from '../locales/en';
 
   const { iconMap } = useSearchSettings();
   const { isMobile } = useMobile();
@@ -82,7 +83,7 @@
       <component 
         :is="iconMap[mapStore.searchQuery.icon as keyof typeof iconMap]" 
         class="w-2 h-2" /> 
-          Videos in this area
+      {{ strings.videos_in_area }}
     </Button>
   </SidebarProvider>
   <div v-if="isMobile" class="fixed bottom-0 p-2 w-full bg-gray-200 h-14 z-100001">

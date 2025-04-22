@@ -40,7 +40,7 @@
                 />
             </div>
             </SheetHeader>
-            <div class="p-4">
+            <div class="p-1">
                 <VideoList v-if="mapStore.selectedOption.value === 'search'" :videos="props.videos" />
                 <VideoList v-if="mapStore.selectedOption.value === 'favorites'" :videos="props.favorites" />
             </div>

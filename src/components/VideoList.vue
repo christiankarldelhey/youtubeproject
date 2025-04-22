@@ -77,18 +77,29 @@ const openVideo = (video: VideoMarker) => {
             :key="video.videoId"
             class="cursor-pointer p-4 border-b text-primary hover:bg-foreground">
             <h4 class="pb-2 font-semibold">{{ removeEmojisAndUppercaseWords(video.title) }}</h4>
-            <div class="flex flex-row justify-between">
+            <div 
+            class="flex justify-between"
+            :class="isMobile ? 'flex-col w-full' : 'flex-row'"
+            >
               <div class="flex flex-col flex-shrink-0">
-                <div class="relative w-48 h-28 overflow-hidden rounded">
+                <div 
+                class="relative overflow-hidden rounded"
+                :class="isMobile ? 'w-full h-9/10' : 'w-48 h-28'"
+                style="aspect-ratio: 16 / 9;"
+                >
                   <img 
                       :src="video.thumbnail" 
                       alt="Video Thumbnail"
-                      class="w-full h-full object-cover" />
+                      class="left-0 w-full h-full object-cover" />
                 </div>
               </div>
-              <div class="flex flex-col px-4 flex-grow max-w-[60%]">
+              <div 
+              class="flex flex-col"
+              :class="isMobile ? 'w-full' : 'px-4 flex-grow max-w-[60%]'"
+              >
                 <p 
-                  class="text-sm leading-tight line-clamp-6 overflow-hidden cursor-pointer" 
+                  class="text-sm leading-tight overflow-hidden cursor-pointer" 
+                  :class="isMobile ? 'line-clamp-3 pt-2' : 'line-clamp-6'"
                   :title="video.description"
                 >
                   {{ video.description }}
