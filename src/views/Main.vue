@@ -17,7 +17,6 @@
   import MobileMenu from '../components/MobileMenu.vue';
   import MobileVideoDetail from '../components/MobileVideoDetail.vue';
   import { useMobile } from '../composables/useMobile';
-  import { Toaster } from '@/components/ui/toast';
   import strings from '../locales/en';
 
   const { iconMap } = useSearchSettings();
@@ -74,7 +73,6 @@
       :favorites="favorites"
       :videos="videos" />
 
-        <!--Search Button este anda-->
     <Button 
       v-if="mapStore.showSearchButton"
       @click="fetchVideos(currentMapPosition, currentZoom)" 
@@ -89,7 +87,6 @@
   <div v-if="isMobile" class="fixed bottom-0 p-2 w-full bg-gray-200 h-14 z-100001">
     <MobileOptions />
   </div>
-  <Toaster />
 </template>
 
 <style>
@@ -102,5 +99,9 @@ div[role="dialog"][data-state="open"] {
 }
 div[data-aria-hidden = true][data-state="open"] {
   z-index: 9999 !important;
+}
+ol, li[role="alert"] {
+  z-index: 100001 !important;
+  color: black !important;
 }
 </style>   
