@@ -27,6 +27,7 @@ const handleLogin = async () => {
   }
 
   await sendLoginLink(email.value);
+  emit('close');
   alert(strings.login_link_sent);
 };
 

@@ -1,10 +1,10 @@
 import { createI18n } from 'vue-i18n';
 import en from './en.ts';
-// import es from './es';
+import es from './es.ts';
 
 const messages = {
   en,
-//es,
+  es,
 };
 
 const i18n = createI18n({

@@ -7,7 +7,7 @@ import { ref, watch, onMounted } from 'vue';
 import { useMap } from '../composables/useMap';
 import { useMobile } from '../composables/useMobile';
 import { MapPin } from 'lucide-vue-next';
-import { Progress } from '@/components/ui/progress'
+import Spinner from './Spinner.vue'
 import type { VideoMarker } from '../types/Map';
 import { useMapStore } from '../store/mapStore';
 
@@ -160,7 +160,7 @@ onMounted(async () => {
   <div v-else class="flex justify-center items-center bg-background w-full h-full">
     <div class="flex flex-col items-center">
       <p class="text-base text-primary">{{ $t('loading_map') }}</p>
-      <Progress class="w-64" :model-value="33" />
+      <Spinner class="mt-2" />
     </div>
   </div>
 </template>

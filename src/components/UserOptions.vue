@@ -11,12 +11,13 @@ import {
 import { Button } from '@/components/ui/button'
 import {
   LogOut,
-  Settings,
+  Languages,
   User,
   KeyRound,
 } from 'lucide-vue-next'
 import { useAuth } from '@/composables/useAuth';
 import LoginDialog from './LoginDialog.vue';
+import LangSelectorDialog from './LangSelectorDialog.vue';
 import type { User as UserType } from "firebase/auth";
 import { ref } from 'vue';
 
@@ -24,6 +25,8 @@ const props = defineProps<{ user: UserType | null }>();
 
 let type = 'Login';
 const loginDialogOpen = ref(false);
+const langSelectorOpen = ref(false);
+
 const { logout } = useAuth();
 
 const manageLoginDialog = (value: boolean, newType: string) => {
@@ -45,25 +48,25 @@ const emit = defineEmits(['close']);
       </Button>
     </DropdownMenuTrigger>
 
-    <DropdownMenuContent class="mr-4 mt-2 w-48 z-9999 bg-background">
+    <DropdownMenuContent class="mr-4 mt-2 w-48 bg-white z-9999">
       <template v-if="props.user">
         <DropdownMenuLabel>{{ props.user?.email }}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem @click="">
-            <Settings class="mr-2 h-4 w-4" />
-            <span>{{ $t('settings') }}</span>
+          <DropdownMenuItem class="cursor-pointer hover:text-white" @click="langSelectorOpen = true">
+            <Languages class="mr-2 h-4 w-4" />
+            <span>{{ $t('language') }}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator v-if="props.user" />
-        <DropdownMenuItem @click="logout">
+        <DropdownMenuItem class="cursor-pointer hover:text-white" @click="logout">
           <LogOut class="mr-2 h-4 w-4" />
           <span>{{ $t('log_out') }}</span>
         </DropdownMenuItem>
       </template>
       <template v-else>
         <DropdownMenuGroup>
-          <DropdownMenuItem @click="manageLoginDialog(true, 'Login')">
+          <DropdownMenuItem class="cursor-pointer hover:text-white" @click="manageLoginDialog(true, 'Login')">
             <KeyRound class="mr-2 h-4 w-4" />
             {{ $t('login') }}
           </DropdownMenuItem>
@@ -76,4 +79,7 @@ const emit = defineEmits(['close']);
     :open="loginDialogOpen" 
     @close="manageLoginDialog(false, 'Login')"
     :type="type" />
+  <LangSelectorDialog 
+    :open="langSelectorOpen"
+    @close="langSelectorOpen = false" />
 </template>

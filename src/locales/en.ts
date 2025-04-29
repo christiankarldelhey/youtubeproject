@@ -15,7 +15,8 @@ export default {
   search_by_topic: "Search by topic",
   save_settings: "Save Settings",
 
-  settings: "Settings",
+  language: "Language",
+  select_lang: "Select language",
   log_out: "Log out",
   login: "Login",
   loading_map: "Loading map...",
@@ -23,4 +24,10 @@ export default {
     search_results: "{label} videos in the area",
     favorites: "Favorited videos",
   },
+  travel: "Travel",
+  food: "Gastronomy",
+  hotel: "Accomodation",
+  hiking: "Hiking (Outdoors)",
+  budget: "Travel on a budget",
+  history: "History",
   };
