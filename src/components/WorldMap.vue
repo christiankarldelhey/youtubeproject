@@ -11,7 +11,6 @@ import Spinner from './Spinner.vue'
 import type { VideoMarker } from '../types/Map';
 import { useMapStore } from '../store/mapStore';
 
-
 const props = defineProps<{
   videos: VideoMarker[],
 }>();
