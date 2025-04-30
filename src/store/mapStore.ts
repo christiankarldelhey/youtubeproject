@@ -10,7 +10,7 @@ export const useMapStore = defineStore('map', {
     dialogOpen: false,
     showSearchButton: false,
     selectedOption: { value: 'search', expanded: false },
-    searchQuery: { value: 'travel', label: 'Travel', icon: 'MapIcon' },
+    searchQuery: { value: 'travel', icon: 'MapIcon' },
     showMobileVideoDetail: false,
   }) as MapStoreState,
   actions: {

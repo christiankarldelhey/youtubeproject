@@ -86,7 +86,6 @@ export interface VideoSnippet {
 
   export interface SearchOption {
     value: string;
-    label: string;
     icon: string;
   }
 

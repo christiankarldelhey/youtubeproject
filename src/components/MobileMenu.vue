@@ -1,14 +1,18 @@
   
   <script setup lang="ts">
-  import { XIcon } from "lucide-vue-next";
+  import { XIcon, HeartIcon } from "lucide-vue-next";
   import { watch } from "vue";
   import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet';
   import VideoList from './VideoList.vue';
   import { useMapStore } from '../store/mapStore';
   import type { VideoMarker } from "../types/Map";
+  import { useSearchSettings } from '../composables/useSearchSettings';
+  import { useI18n } from 'vue-i18n';
 
+  const { t } = useI18n();
   const mapStore = useMapStore();
   const props = defineProps<{ videos: VideoMarker[]; favorites: VideoMarker[]; open: boolean }>();
+  const { iconMap } = useSearchSettings();
   
   watch(() => props.videos, (newVideos) => {
     if (newVideos.length > 0) {
@@ -29,11 +33,13 @@
             <SheetHeader class="p-4 border-b sticky top-0 bg-background z-10">
             <div class="flex items-center justify-between w-full">
                 <div v-if="mapStore.selectedOption.value === 'search'" class="text-primary text-sm truncate">
-                {{ mapStore.searchQuery.label }} videos in the area
+                  <span class="flex flex-row items-center gap-2 text-primary font-semibold">
+                    <component :is="iconMap[mapStore.searchQuery.icon as keyof typeof iconMap]" class="h-4 w-4" /> {{ t('sidebar.search_results', { label: t(mapStore.searchQuery.value) }) }}
+                  </span>
                 </div>
-                <div v-else-if="mapStore.selectedOption.value === 'favorites'" class="text-primary text-sm truncate">
-                Favorited videos
-                </div>
+                <span class="flex flex-row items-center gap-2 text-primary font-semibold" v-if="mapStore.selectedOption.value === 'favorites'">
+                  <HeartIcon class="h-4 w-4" /> {{ t('sidebar.favorites') }}
+                </span>
                 <XIcon 
                 @click="mapStore.setSelectedOption(mapStore.selectedOption.value, false)" 
                 class="flex-shrink-0 h-4 w-4 text-right cursor-pointer"

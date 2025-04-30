@@ -42,8 +42,8 @@ const openVideo = (video: VideoMarker) => {
 
 // const goToLocation = (video: VideoMarker) => {
 //   setTimeout(() => {
-//     mapStore.triggerFlyTo(video.position, 15);
-//   }, 1000);
+//     mapStore.triggerFlyTo(video.position, 12);
+//   }, 2000);
 // };
 
 </script>
@@ -56,7 +56,7 @@ const openVideo = (video: VideoMarker) => {
     </div>
     <div v-else v-for="group in groupedVideoMarkers" :key="group.location">
         <div 
-        class="cursor-pointer px-4 py-2 border-b text-primary flex justify-between items-center"
+        class="cursor-pointer px-4 py-2 border-b border-foreground text-primary flex justify-between items-center"
         @click="toggleCollapse(group.location)">
         <div class="flex items-center gap-2">
             <MapPin class="h-4 w-4 text-gray-500" />
@@ -75,7 +75,7 @@ const openVideo = (video: VideoMarker) => {
             v-for="video in group.videos"
             @click="openVideo(video)"
             :key="video.videoId"
-            class="cursor-pointer p-4 border-b text-primary hover:bg-foreground">
+            class="cursor-pointer p-4 border-b border-foreground text-primary hover:bg-foreground">
             <h4 class="pb-2 font-semibold">{{ removeEmojisAndUppercaseWords(video.title) }}</h4>
             <div 
             class="flex justify-between"

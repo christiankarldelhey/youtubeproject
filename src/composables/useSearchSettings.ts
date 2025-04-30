@@ -1,5 +1,4 @@
 import { Utensils, Bed, Tent, CircleDollarSign, MapIcon, Scroll } from 'lucide-vue-next';
-import { useI18n } from 'vue-i18n';
 
 export function useSearchSettings() {
 
@@ -12,14 +11,13 @@ export function useSearchSettings() {
         Scroll,
     };
 
-    const { t } = useI18n();
     const searchOptions = [
-        { value: 'travel', label: t('travel'), icon: 'MapIcon' },
-        { value: 'food', label: t('food'), icon: 'Utensils' },
-        { value: 'hotel', label: t('hotel'), icon: 'Bed' },
-        { value: 'hiking', label: t('hiking'), icon: 'Tent' },
-        { value: 'budget', label: t('budget'), icon: 'CircleDollarSign' },
-        { value: 'history', label: t('history'), icon: 'Scroll' },
+        { value: 'travel', icon: 'MapIcon' },
+        { value: 'food', icon: 'Utensils' },
+        { value: 'hotel', icon: 'Bed' },
+        { value: 'hiking', icon: 'Tent' },
+        { value: 'budget', icon: 'CircleDollarSign' },
+        { value: 'history', icon: 'Scroll' },
       ];
 
     return {

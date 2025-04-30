@@ -2,6 +2,7 @@ import { ref, onUnmounted } from 'vue';
 import { db, auth } from "../firebase";
 import { collection, addDoc, deleteDoc, doc, onSnapshot, getDocs } from "firebase/firestore";
 import type { VideoMarker } from '../types/Map';
+import { useI18n } from 'vue-i18n';
 import { toast } from '@/components/ui/toast';
 
 const favorites = ref<VideoMarker[]>([]);
@@ -11,6 +12,7 @@ const error = ref<Error | null>(null);
 let hasInitialized = false;
 
 export function useFavorites() {
+  const { t } = useI18n();
   const fetchFavorites = async () => {
     const user = auth.currentUser;
     if (!user) return;
@@ -80,15 +82,15 @@ export function useFavorites() {
       video.favorited = true;
       await addFavorite(video);
       toast({
-        title: "Added to favorites",
-        description: `"${video.title}" was added to your favorites.`,
+        title: t('toast.added_to_favorites_title'),
+        description: t('toast.added_to_favorites_description', { label: video.title }),
       });
     } else {
       video.favorited = false;
       await removeFavorite(video.videoId);
       toast({
-        title: "Removed from favorites",
-        description: `"${video.title}" was removed from your favorites.`,
+        title: t('toast.removed_from_favorites_title'),
+        description: t('toast.removed_from_favorites_description', { label: video.title }),
       });
     }
   };

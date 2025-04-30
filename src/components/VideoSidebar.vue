@@ -15,12 +15,14 @@ import { Button } from '@/components/ui/button';
 import VideoList from './VideoList.vue';
 import { useMapStore } from '../store/mapStore';
 import { useMobile } from '../composables/useMobile';
+import { useSearchSettings } from '../composables/useSearchSettings';
 import type { VideoMarker } from "../types/Map";
 
 const mapStore = useMapStore();
 const { isMobile } = useMobile();
 const props = defineProps<{ videos: VideoMarker[]; favorites: VideoMarker[] }>();
 const { state } = useSidebar();
+const { iconMap } = useSearchSettings();
 
 watch(() => props.videos, (newVideos) => {
   if (newVideos.length > 0) {
@@ -34,7 +36,7 @@ watch(() => props.videos, (newVideos) => {
   <div v-if="!isMobile" class="hidden md:block">
     <Sidebar collapsible="icon">
       <SidebarContent class="flex flex-row bg-background text-white h-screen gap-0">
-        <SidebarGroup class="min-w-[50px] w-[50px] bg-background border-r">
+        <SidebarGroup class="min-w-[50px] w-[50px] bg-background border-r border-foreground">
           <SidebarGroupContent class="flex flex-col items-center">
             <SidebarMenu>
               <SidebarMenuItem>
@@ -66,13 +68,13 @@ watch(() => props.videos, (newVideos) => {
         <div 
           v-if="state === 'expanded'" 
           class="flex-1 h-screen overflow-y-auto bg-background">
-          <div class="flex flex-row justify-between text-primary border-b cursor-pointer p-4 
+          <div class="flex flex-row justify-between text-primary border-b border-foreground cursor-pointer p-4 
                       sticky top-0 bg-background z-10 shadow-sm">
-            <span v-if="mapStore.selectedOption.value === 'search'">
-              {{ $t('sidebar.search_results', { label: mapStore.searchQuery.label }) }}
+            <span class="flex flex-row items-center gap-2 font-semibold text-primary" v-if="mapStore.selectedOption.value === 'search'">
+              <component :is="iconMap[mapStore.searchQuery.icon as keyof typeof iconMap]" class="h-4 w-4" /> {{ $t('sidebar.search_results', { label: $t(mapStore.searchQuery.value) }) }}
             </span>
-            <span v-if="mapStore.selectedOption.value === 'favorites'">
-              {{ $t('sidebar.favorites') }}
+            <span class="flex flex-row items-center gap-2 font-semibold text-primary" v-if="mapStore.selectedOption.value === 'favorites'">
+              <HeartIcon class="h-4 w-4" /> {{ $t('sidebar.favorites') }}
             </span>
             <XIcon @click="mapStore.setSelectedOption(mapStore.selectedOption.value, false)" class="h-6 w-6" />
           </div>

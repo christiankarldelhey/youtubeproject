@@ -30,4 +30,10 @@ export default {
   hiking: "Hiking (Outdoors)",
   budget: "Travel on a budget",
   history: "History",
-  };
+  toast: {
+    added_to_favorites_title: "Added to favorites",
+    removed_from_favorites_title: "Removed from favorites",
+    added_to_favorites_description: "{label} was added to your favorites.",
+    removed_from_favorites_description: "{label} was removed from your favorites.",
+  }
+};

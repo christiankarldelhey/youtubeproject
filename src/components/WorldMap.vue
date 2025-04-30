@@ -139,9 +139,9 @@ onMounted(async () => {
         @click="selectVideo(marker)">
         <l-popup 
           @click="openVideo()" 
-          class="relative cursor-pointer z-9999"> 
+          class="relative cursor-pointer z-100001"> 
           <span class="z-9999 text-primary flex flex-row mb-2">
-            <MapPin class="w-4 h-4 mr-1" /> {{ marker.location?.toUpperCase() }}
+            <MapPin class="w-4 h-4 mr-1 z-10001" /> {{ marker.location?.toUpperCase() }}
           </span>
           <div class="relative w-64 h-36 overflow-hidden rounded">
             <img 

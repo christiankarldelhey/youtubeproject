@@ -20,14 +20,20 @@ export default {
     login: "Iniciar sesión",
     loading_map: "Cargando mapa...",
     sidebar: {
-      search_results: "Videos de {label} en la zona",
+      search_results: "Videos de {label} en el área",
       favorites: "Videos favoritos",
     },
-    travel: "Viaje",
-    food: "Gastronomía",
-    hotel: "Alojamientos",
-    hiking: "Senderismo",
-    budget: "Viajar barato",
-    history: "Historia",
+    travel: "viaje",
+    food: "gastronomía",
+    hotel: "alojamientos",
+    hiking: "senderismo",
+    budget: "viajar barato",
+    history: "historia",
+    toast: {
+      added_to_favorites_title: "Agregar a favoritos",
+      removed_from_favorites_title: "Eliminar de favoritos",
+      added_to_favorites_description: "{label} se agrego a favoritos.",
+      removed_from_favorites_description: "{label} se elimino de favoritos.",
+    }
   };
   
