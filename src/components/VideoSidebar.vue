@@ -36,7 +36,7 @@ watch(() => props.videos, (newVideos) => {
   <div v-if="!isMobile" class="hidden md:block">
     <Sidebar collapsible="icon">
       <SidebarContent class="flex flex-row bg-background text-white h-screen gap-0">
-        <SidebarGroup class="min-w-[50px] w-[50px] bg-background border-r border-foreground">
+        <SidebarGroup class="min-w-[50px] w-[50px] bg-background border-r">
           <SidebarGroupContent class="flex flex-col items-center">
             <SidebarMenu>
               <SidebarMenuItem>
@@ -44,8 +44,8 @@ watch(() => props.videos, (newVideos) => {
                   <Button
                     @click="mapStore.setSelectedOption('search', true)"
                     class="flex items-center gap-2 w-full p-2 rounded-md transition-colors
-                            cursor-pointer bg-white text-primary hover:bg-accent" 
-                    :class="{ 'bg-accent text-white': mapStore.selectedOption.value === 'search' }">
+                            cursor-pointer bg-background text-primary hover:bg-secondary" 
+                    :class="{ 'bg-accent text-white hover:text-white hover:bg-accent': mapStore.selectedOption.value === 'search' }">
                     <List />
                   </Button>
                 </SidebarMenuButton>
@@ -56,8 +56,8 @@ watch(() => props.videos, (newVideos) => {
                   <Button
                     @click="mapStore.setSelectedOption('favorites', true)"
                     class="flex items-center gap-2 w-full p-2 rounded-md transition-colors
-                            cursor-pointer bg-white text-primary hover:bg-accent" 
-                    :class="{ 'bg-accent text-white': mapStore.selectedOption.value === 'favorites' }">
+                            cursor-pointer bg-background text-primary hover:bg-secondary" 
+                    :class="{ 'bg-accent text-white hover:text-white hover:bg-accent': mapStore.selectedOption.value === 'favorites' }">
                     <HeartIcon />
                   </Button>
                 </SidebarMenuButton>
@@ -68,7 +68,7 @@ watch(() => props.videos, (newVideos) => {
         <div 
           v-if="state === 'expanded'" 
           class="flex-1 h-screen overflow-y-auto bg-background">
-          <div class="flex flex-row justify-between text-primary border-b border-foreground cursor-pointer p-4 
+          <div class="flex flex-row justify-between text-primary border-b cursor-pointer p-4 
                       sticky top-0 bg-background z-10 shadow-sm">
             <span class="flex flex-row items-center gap-2 font-semibold text-primary" v-if="mapStore.selectedOption.value === 'search'">
               <component :is="iconMap[mapStore.searchQuery.icon as keyof typeof iconMap]" class="h-4 w-4" /> {{ $t('sidebar.search_results', { label: $t(mapStore.searchQuery.value) }) }}

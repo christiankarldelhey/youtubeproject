@@ -113,7 +113,7 @@ onMounted(async () => {
     @ready="onMapReady">
     
     <l-tile-layer
-      :url="mapsList.cartoLight"
+      :url="mapsList.carto"
       layer-type="base"
       name="map"
     />

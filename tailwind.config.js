@@ -20,11 +20,11 @@ module.exports = {
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
   			},
-			primary: '#2c3e50', // Deep slate blue (for contrast & readability)
-			secondary: '#8699a0', // Soft neutral blue-gray (for secondary elements)
-			accent: '#d47b54', // Warm muted orange (for highlights)
-			background: '#eeeeee', // Very light gray (for background elements)
-			foreground: '#c3c9cc', // Soft gray-blue (for text & UI elements)
+			primary: '#2e3c50', // Text Gray (for contrast & readability)
+			secondary: '#f8f7ff', // Soft violet (for secondary elements and hovers)
+			accent: '#6639de', // Violet (for highlights)
+			background: '#ffffff', // White (for background elements)
+			foreground: '#86819a', // Gray (for text & UI elements)
   		},
 		zIndex: {
 			9998: '9998',

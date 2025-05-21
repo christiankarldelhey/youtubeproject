@@ -56,16 +56,16 @@ const openVideo = (video: VideoMarker) => {
     </div>
     <div v-else v-for="group in groupedVideoMarkers" :key="group.location">
         <div 
-        class="cursor-pointer px-4 py-2 border-b border-foreground text-primary flex justify-between items-center"
+        class="cursor-pointer px-4 py-2 border-b text-primary flex justify-between items-center"
         @click="toggleCollapse(group.location)">
         <div class="flex items-center gap-2">
             <MapPin class="h-4 w-4 text-gray-500" />
-            <span class="text-sm text-gray-600"> {{ group.location.toUpperCase() }} </span>
+            <span class="text-sm text-gray-600"> {{ group.location.toUpperCase() }} ({{ group.videos.length }}) </span>
         </div>        
         <div class="flex items-center gap-4">
-            <Avatar class="bg-foreground text-primary h-6 w-6">
+            <!-- <Avatar class="bg-accent text-white h-6 w-6">
                 <AvatarFallback>{{group.videos.length}}</AvatarFallback>
-            </Avatar>
+            </Avatar> -->
             <ChevronDownIcon v-if="collapsedLocations[group.location]" />
             <ChevronUpIcon v-else />
         </div>
@@ -75,7 +75,7 @@ const openVideo = (video: VideoMarker) => {
             v-for="video in group.videos"
             @click="openVideo(video)"
             :key="video.videoId"
-            class="cursor-pointer p-4 border-b border-foreground text-primary hover:bg-foreground">
+            class="cursor-pointer p-4 border-b text-primary hover:bg-secondary">
             <h4 class="pb-2 font-semibold">{{ removeEmojisAndUppercaseWords(video.title) }}</h4>
             <div 
             class="flex justify-between"

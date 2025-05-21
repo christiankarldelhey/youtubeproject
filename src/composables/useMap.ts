@@ -13,9 +13,11 @@ export function useMap() {
         esri: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         wikimedia: "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png",
         voyager: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
-        stamenToner: "https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png",
         watercolor: "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}{r}.jpg",
         stadia2: "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
+        stamenToner: 'https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png',
+        stamenTerrain: 'https://stamen-tiles.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png',
+        stamenWatercolor: 'https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg',
     };
 
     const heartIcon = L.divIcon({
