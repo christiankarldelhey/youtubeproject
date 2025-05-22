@@ -28,7 +28,7 @@ const mapStore = useMapStore();
 
   <style scoped>
     .active {
-      background-color: #d47b54;
+      background-color: #6639de;
       color: white;
     }
   </style>

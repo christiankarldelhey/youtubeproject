@@ -3,7 +3,6 @@ import { ref, computed } from 'vue';
 import { useMapStore } from '../store/mapStore';
 import { removeEmojisAndUppercaseWords } from '@/utils/utils.ts';
 import type { VideoMarker } from '../types/Map';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useMobile } from '../composables/useMobile';
 import { useAuth } from '../composables/useAuth';
 import { ChevronUpIcon, ChevronDownIcon, MapPin } from 'lucide-vue-next';
@@ -63,11 +62,8 @@ const openVideo = (video: VideoMarker) => {
             <span class="text-sm text-gray-600"> {{ group.location.toUpperCase() }} ({{ group.videos.length }}) </span>
         </div>        
         <div class="flex items-center gap-4">
-            <!-- <Avatar class="bg-accent text-white h-6 w-6">
-                <AvatarFallback>{{group.videos.length}}</AvatarFallback>
-            </Avatar> -->
-            <ChevronDownIcon v-if="collapsedLocations[group.location]" />
-            <ChevronUpIcon v-else />
+            <ChevronDownIcon v-if="collapsedLocations[group.location]" class="h-4 w-4 text-gray-500" />
+            <ChevronUpIcon v-else class="h-4 w-4 text-gray-500" />
         </div>
         </div>
         <div v-show="!collapsedLocations[group.location]">

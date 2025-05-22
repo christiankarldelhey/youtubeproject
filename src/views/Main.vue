@@ -79,7 +79,7 @@
       v-if="mapStore.showSearchButton"
       @click="fetchVideos(currentMapPosition, currentZoom)" 
       variant="secondary"
-      class="absolute z-9999 left-1/2 top-24 transform -translate-x-1/2 border text-sm">
+      class="absolute z-9999 left-1/2 top-24 transform -translate-x-1/2 border text-sm bg-background text-primary hover:bg-secondary">
       <component 
         :is="iconMap[mapStore.searchQuery.icon as keyof typeof iconMap]" 
         class="w-2 h-2" /> 
