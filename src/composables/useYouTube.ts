@@ -12,6 +12,8 @@ export function useYoutube() {
   const videos = ref<VideoMarker[]>([]);
   const loading = ref(false);
   const error = ref<Error | null>(null);
+  const lastSearchCenter = ref<[number, number] | null>(null);
+  const lastSearchRadiusKm = ref<number>(0);
 
   const fetchVideoDetails = async (videoIds: string[], apiKey: string): Promise<DetailedVideoItem[]> => {
     const endpoint = 'https://youtube.googleapis.com/youtube/v3/videos';
@@ -33,7 +35,7 @@ export function useYoutube() {
   };
 
   const calculateRadiusFromZoom = (zoomLevel: number): string => {
-    const reductionFactor = 0.7;
+    const reductionFactor = 0.5;
     const radiusKm = (40075 / Math.pow(2, zoomLevel)) * reductionFactor;
     const limitedRadius = Math.min(Math.ceil(radiusKm), 1000);
     return `${limitedRadius}km`;
@@ -50,6 +52,12 @@ export function useYoutube() {
     error.value = null;
 
     const currentRadius = calculateRadiusFromZoom(currentZoom ?? 10) ?? '1000km';
+    
+    // Guardar centro y radio para visualización
+    if (currentMapPosition) {
+      lastSearchCenter.value = [currentMapPosition[0], currentMapPosition[1]];
+      lastSearchRadiusKm.value = parseInt(currentRadius.replace('km', ''));
+    }
 
     const endpoint = `https://youtube.googleapis.com/youtube/v3/search`;
 
@@ -107,5 +115,7 @@ export function useYoutube() {
     loading,
     error,
     fetchYoutubeVideos,
+    lastSearchCenter,
+    lastSearchRadiusKm,
   };
 }

@@ -6,6 +6,7 @@ import { LMarkerClusterGroup } from 'vue-leaflet-markercluster'
 import { ref, watch, onMounted } from 'vue';
 import { useMap } from '../composables/useMap';
 import { useMobile } from '../composables/useMobile';
+import { useSidebarOffset } from '../composables/useSidebarOffset';
 import { MapPin } from 'lucide-vue-next';
 import Spinner from './Spinner.vue'
 import type { VideoMarker } from '../types/Map';
@@ -13,15 +14,19 @@ import { useMapStore } from '../store/mapStore';
 
 const props = defineProps<{
   videos: VideoMarker[],
+  searchCenter?: [number, number] | null,
+  searchRadiusKm?: number,
 }>();
 
-const emit = defineEmits(['fetch-videos']);
+const emit = defineEmits(['fetch-videos', 'visual-center-changed']);
 const { isMobile } = useMobile();
 
 const mapStore = useMapStore();
 const { initializeLeaflet, getUserLocation, mapsList, heartIcon, defaultIcon } = useMap();
+const { adjustCenterForSidebar } = useSidebarOffset();
 const mapRef = ref();
 const mapReady = ref(false);
+const searchCircle = ref<L.Circle | null>(null);
 
 
 const moveMapCenter = () => {
@@ -29,10 +34,17 @@ const moveMapCenter = () => {
     return;
   } 
   if (mapRef.value?.leafletObject) {
-    const mapCenter = mapRef.value.leafletObject.getCenter();
-    const zoom = mapRef.value.leafletObject.getZoom();
+    const map = mapRef.value.leafletObject;
+    const mapCenter = map.getCenter();
+    const zoom = map.getZoom();
     mapStore.setCenter([mapCenter.lat, mapCenter.lng]);
     mapStore.setZoom(zoom);
+
+    // Calcular centro visual ajustado por el sidebar
+    const visualCenter = adjustCenterForSidebar(map, mapCenter);
+    
+    emit('visual-center-changed', [visualCenter.lat, visualCenter.lng]);
+    
     zoom >= 5 ? mapStore.setShowSearchButton(true) : mapStore.setShowSearchButton(false);
   }
 };
@@ -52,14 +64,21 @@ watch(
   (target) => {
     if (!target || !mapRef.value?.leafletObject) return;
 
+    const map = mapRef.value.leafletObject;
+
     if (target?.bbox) {
       console.log('Using fitBounds');
-      mapRef.value.leafletObject.fitBounds(L.latLngBounds(
+      map.fitBounds(L.latLngBounds(
         [target.bbox[1], target.bbox[0]],
         [target.bbox[3], target.bbox[2]]
       ));
     } else {
-      mapRef.value.leafletObject.flyTo(target.center, target.zoom ?? 12, 
+      // Ajustar el centro para compensar el sidebar
+      const targetLatLng = L.latLng(target.center[0], target.center[1]);
+      const adjustedCenter = adjustCenterForSidebar(map, targetLatLng);
+      
+      // Volar al centro ajustado para que visualmente aparezca centrado
+      map.flyTo([adjustedCenter.lat, adjustedCenter.lng], target.zoom ?? 12, 
       {
         animate: true,
         duration: 2.5,
@@ -87,6 +106,51 @@ const openVideo = () => {
 const getMarkerIcon = (marker: VideoMarker): L.Icon<L.IconOptions> => {
   return (marker.favorited ? heartIcon : defaultIcon) as L.Icon<L.IconOptions>;
 };
+
+const updateSearchCircle = () => {
+  if (!mapRef.value?.leafletObject) return;
+  
+  const map = mapRef.value.leafletObject;
+  
+  // Remover círculo anterior si existe
+  if (searchCircle.value) {
+    map.removeLayer(searchCircle.value);
+    searchCircle.value = null;
+  }
+  
+  // Crear nuevo círculo si hay datos de búsqueda
+  if (props.searchCenter && props.searchRadiusKm && props.searchRadiusKm > 0) {
+    // Usar el centro de búsqueda original (ya viene ajustado desde el emit)
+    searchCircle.value = L.circle(props.searchCenter, {
+      radius: props.searchRadiusKm * 1000, // convertir km a metros
+      color: '#999999',
+      fillColor: 'transparent',
+      fillOpacity: 0,
+      weight: 1.5,
+      opacity: 0.3,
+      dashArray: '5, 10'
+    }).addTo(map);
+  }
+};
+
+watch(
+  () => [props.searchCenter, props.searchRadiusKm],
+  () => {
+    updateSearchCircle();
+  },
+  { deep: true }
+);
+
+// Recalcular centro visual cuando cambia el estado del sidebar
+watch(
+  () => mapStore.selectedOption.expanded,
+  () => {
+    // Esperar un tick para que el DOM se actualice
+    setTimeout(() => {
+      moveMapCenter();
+    }, 100);
+  }
+);
 
 onMounted(async () => {
   initializeLeaflet();

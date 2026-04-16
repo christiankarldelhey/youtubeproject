@@ -80,8 +80,16 @@ export interface VideoSnippet {
     maxResults?: number;
     apiKey: string;
     currentMapPosition?: number[];
+    visualCenter?: number[];
     currentZoom?: number;
     searchQuery?: string;
+    mapBounds?: {
+      north: number;
+      south: number;
+      east: number;
+      west: number;
+    };
+    sidebarOpen?: boolean;
   }
 
   export interface SearchOption {

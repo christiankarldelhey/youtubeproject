@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import { computed, ref } from 'vue';
   import SearchBar from '../components/SearchBar.vue';
   import WorldMap from '../components/WorldMap.vue';
   import { useYoutube } from '../composables/useYouTube';
@@ -32,10 +32,18 @@
   const currentMapPosition = computed(() => mapStore.center);
 
   const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
-  const { videos, fetchYoutubeVideos } = useYoutube();
+  const { videos, fetchYoutubeVideos, lastSearchCenter, lastSearchRadiusKm } = useYoutube();
+
+  const visualCenter = ref<center | null>(null);
+
+  const handleVisualCenterChanged = (center: center) => {
+    visualCenter.value = center;
+  };
 
   const fetchVideos = (currentMapPosition: center, currentZoom: zoom) => {
-    fetchYoutubeVideos({ apiKey, currentMapPosition, currentZoom, searchQuery: mapStore.searchQuery.value });
+    // Usar el centro visual si está disponible, sino el centro geométrico
+    const searchCenter = visualCenter.value || currentMapPosition;
+    fetchYoutubeVideos({ apiKey, currentMapPosition: searchCenter, currentZoom, searchQuery: mapStore.searchQuery.value });
     mapStore.setShowSearchButton(false);
   }
 </script>
@@ -57,7 +65,10 @@
     <div class="flex flex-col w-full">
         <WorldMap 
           :videos="mapStore.selectedOption.value === 'favorites' ? favorites : videos" 
+          :search-center="lastSearchCenter"
+          :search-radius-km="lastSearchRadiusKm"
           @fetch-videos="fetchVideos(currentMapPosition, currentZoom)"
+          @visual-center-changed="handleVisualCenterChanged"
           />
     </div>
     <VideoDialog
