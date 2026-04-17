@@ -11,16 +11,10 @@ import {
 } from '@/components/ui/popover';
 import type { center, bbox } from '../types/Map';
 import { useMapStore } from '../store/mapStore';
-import SearchSettingsDialog from './SearchSettingsDialog.vue';
-import { useSearchSettings } from '../composables/useSearchSettings';
 import { useMobile } from '../composables/useMobile';
-import { Button } from '@/components/ui/button';
 
 const { isMobile } = useMobile();
-const { iconMap } = useSearchSettings();
 const mapStore = useMapStore();
-
-const emit = defineEmits(['fetch-videos']);
 
 const { autocompleteSearchLocation } = useSearchLocation();
 const term = ref('');
@@ -43,12 +37,6 @@ const closeAndGoToLocation = (coordinates: center, bbox?: bbox) => {
   mapStore.triggerFlyTo([lat, lng], 12, bbox);
 };
 
-const settingsDialogOpen = ref(false);
-
-const manageSettingsDialog = (value: boolean) => {
-  settingsDialogOpen.value = value;
-};
-
 watch(term, (newVal) => {
   if (!newVal) {
     isPopoverOpen.value = false;
@@ -63,12 +51,6 @@ watch(term, (newVal) => {
     class="fixed top-5 flex items-center z-9999"
     :class="isMobile ? 'left-2' : 'right-16'"
     >
-      <Button
-            @click="manageSettingsDialog(true)"
-            class="flex items-center gap-2 w-full p-2 mr-2 rounded-md transition-colors
-                    cursor-pointer bg-white text-primary hover:bg-white h-9 w-9" >
-            <component :is="iconMap[mapStore.searchQuery.icon as keyof typeof iconMap]" />
-        </Button>
       <div class="relative rounded-md bg-white">
         <PopoverTrigger as-child>
           <Input 
@@ -109,7 +91,4 @@ watch(term, (newVal) => {
       </PopoverContent>
     </div>
   </Popover>
-  <SearchSettingsDialog 
-    :open="settingsDialogOpen" 
-    @close="manageSettingsDialog(false)" />
 </template>
