@@ -1,37 +1,35 @@
-import { ref, onUnmounted } from 'vue';
-import { db, auth } from "../firebase";
-import { collection, addDoc, deleteDoc, doc, onSnapshot, getDocs } from "firebase/firestore";
+import { ref, watch } from 'vue';
+import { auth } from "../firebase";
 import type { VideoMarker } from '../types/Map';
 import { useI18n } from 'vue-i18n';
 import { toast } from '@/components/ui/toast';
+import { useBackendApi } from './useBackendApi';
 
 const favorites = ref<VideoMarker[]>([]);
 const loading = ref(false);
 const error = ref<Error | null>(null);
 
-let hasInitialized = false;
-
 export function useFavorites() {
   const { t } = useI18n();
+  const { getUserFavorites, addFavorite: addFavoriteApi, removeFavorite: removeFavoriteApi } = useBackendApi();
+
   const fetchFavorites = async () => {
     const user = auth.currentUser;
-    if (!user) return;
+    if (!user) {
+      favorites.value = [];
+      return;
+    }
 
     try {
-      const querySnapshot = await getDocs(collection(db, `users/${user.uid}/favorites`));
-      favorites.value = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        videoId: doc.data().videoId ?? '',
-        title: doc.data().title ?? '',
-        thumbnail: doc.data().thumbnail ?? '',
-        favorited: doc.data().favorited ?? false,
-        description: doc.data().description ?? '',
-        location: doc.data().location ?? '',
-        position: doc.data().position ?? [0, 0],
-      })) as VideoMarker[];
+      loading.value = true;
+      const favs = await getUserFavorites(user.uid);
+      favorites.value = favs.map(fav => ({ ...fav, favorited: true }));
+      error.value = null;
     } catch (err) {
       error.value = err as Error;
       console.error("Error fetching favorites:", err);
+    } finally {
+      loading.value = false;
     }
   };
 
@@ -40,20 +38,19 @@ export function useFavorites() {
     if (!user) return;
 
     try {
-      await addDoc(collection(db, `users/${user.uid}/favorites`), {
-        videoId: video.videoId ?? '',
-        title: video.title ?? '',
-        thumbnail: video.thumbnail ?? '',
-        favorited: true,
-        description: video.description ?? '',
-        location: video.location ?? '',
-        position: video.position ?? [0, 0]
-      });
-
-      await fetchFavorites();
+      loading.value = true;
+      const success = await addFavoriteApi(user.uid, video);
+      
+      if (success) {
+        await fetchFavorites();
+      } else {
+        throw new Error('Failed to add favorite');
+      }
     } catch (err) {
       error.value = err as Error;
       console.error("Error adding favorite:", err);
+    } finally {
+      loading.value = false;
     }
   };
 
@@ -62,20 +59,35 @@ export function useFavorites() {
     if (!user) return;
 
     try {
-      const snapshot = await getDocs(collection(db, `users/${user.uid}/favorites`));
-      const docToDelete = snapshot.docs.find(doc => doc.data().videoId === videoId);
-      if (!docToDelete) return;
-
-      await deleteDoc(doc(db, `users/${user.uid}/favorites`, docToDelete.id));
-      await fetchFavorites();
+      loading.value = true;
+      const success = await removeFavoriteApi(user.uid, videoId);
+      
+      if (success) {
+        await fetchFavorites();
+      } else {
+        throw new Error('Failed to remove favorite');
+      }
     } catch (err) {
       error.value = err as Error;
       console.error("Error removing favorite:", err);
+    } finally {
+      loading.value = false;
     }
   };
 
   const toggleFavorite = async (video: VideoMarker) => {
     if (!video) return;
+    
+    const user = auth.currentUser;
+    if (!user) {
+      toast({
+        title: t('toast.login_required_title') || 'Login Required',
+        description: t('toast.login_required_description') || 'Please login to add videos to favorites',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const isFavorite = favorites.value.some(fav => fav.videoId === video.videoId);
 
     if (!isFavorite) {
@@ -95,39 +107,14 @@ export function useFavorites() {
     }
   };
 
-  if (!hasInitialized) {
-    hasInitialized = true;
-
-    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
-      if (user) {
-        fetchFavorites();
-      }
-    });
-
-    const unsubscribe = onSnapshot(
-      collection(db, `users/${auth.currentUser?.uid}/favorites`),
-      (snapshot) => {
-        favorites.value = snapshot.docs.map(doc => ({
-          id: doc.id,
-          videoId: doc.data().videoId ?? '',
-          title: doc.data().title ?? '',
-          thumbnail: doc.data().thumbnail ?? '',
-          description: doc.data().description ?? '',
-          location: doc.data().location ?? '',
-          position: doc.data().position ?? [0, 0],
-        })) as VideoMarker[];
-      },
-      (err) => {
-        error.value = err;
-        console.error("Error in snapshot:", err);
-      }
-    );
-
-    onUnmounted(() => {
-      unsubscribe();
-      unsubscribeAuth();
-    });
-  }
+  // Watch auth state changes
+  watch(() => auth.currentUser, (user) => {
+    if (user) {
+      fetchFavorites();
+    } else {
+      favorites.value = [];
+    }
+  }, { immediate: true });
 
   return {
     favorites,
