@@ -8,6 +8,8 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(4000),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   METEOALARM_FEED_URL: z.string().url().default('https://feeds.meteoalarm.org/'),
+  INGEST_DEFAULT_LIMIT: z.coerce.number().int().positive().default(100),
+  INGEST_MAX_LIMIT: z.coerce.number().int().positive().default(500),
   DB_HOST: z.string().default('localhost'),
   DB_PORT: z.coerce.number().int().positive().default(5432),
   DB_NAME: z.string().default('weather-db'),
