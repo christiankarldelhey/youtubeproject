@@ -1,0 +1,29 @@
+{
+  "name": "weather-alerts-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "check:db": "tsx src/scripts/check-db.ts"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "fast-xml-parser": "^4.5.1",
+    "pg": "^8.13.3",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.13.10",
+    "@types/pg": "^8.20.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
