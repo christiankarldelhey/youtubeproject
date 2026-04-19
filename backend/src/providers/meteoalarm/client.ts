@@ -3,8 +3,10 @@ import { env } from '../../config/env.js';
 
 type FeedEntry = {
   id?: unknown;
+  guid?: unknown;
   title?: unknown;
   updated?: unknown;
+  pubDate?: unknown;
   link?: unknown;
 };
 
@@ -79,9 +81,9 @@ function readLink(link: unknown): string | null {
 
 function normalizeEntry(entry: FeedEntry): MeteoalarmPreviewEntry {
   return {
-    id: readText(entry.id),
+    id: readText(entry.id ?? entry.guid),
     title: readText(entry.title),
-    updated: readText(entry.updated),
+    updated: readText(entry.updated ?? entry.pubDate),
     link: readLink(entry.link),
   };
 }
@@ -89,7 +91,6 @@ function normalizeEntry(entry: FeedEntry): MeteoalarmPreviewEntry {
 export async function fetchMeteoalarmPreview(limit = 10): Promise<MeteoalarmPreview> {
   const response = await fetch(env.METEOALARM_FEED_URL, {
     headers: {
-      Accept: 'application/atom+xml, application/xml, text/xml',
       'User-Agent': 'weather-alerts-backend/0.1',
     },
   });
@@ -103,9 +104,14 @@ export async function fetchMeteoalarmPreview(limit = 10): Promise<MeteoalarmPrev
     feed?: {
       entry?: FeedEntry | FeedEntry[];
     };
+    rss?: {
+      channel?: {
+        item?: FeedEntry | FeedEntry[];
+      };
+    };
   };
 
-  const rawEntries = parsed.feed?.entry;
+  const rawEntries = parsed.feed?.entry ?? parsed.rss?.channel?.item;
   const entriesArray = Array.isArray(rawEntries)
     ? rawEntries
     : rawEntries
