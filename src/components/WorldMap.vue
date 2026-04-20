@@ -1,18 +1,30 @@
 <script setup lang="ts">
 import L from 'leaflet';
-import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet";
-import { ref, watch, onMounted } from 'vue';
+import { LMap, LMarker, LTileLayer } from "@vue-leaflet/vue-leaflet";
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { useMap } from '../composables/useMap';
 import { useAlerts } from '../composables/useAlerts';
+import { useWeatherIcon } from '../composables/useWeatherIcon';
 import { useMobile } from '../composables/useMobile';
 import Spinner from './Spinner.vue'
 import { useMapStore } from '../store/mapStore';
+import type { CityWeatherCurrent } from '../types/Alert';
 
 const { isMobile } = useMobile();
+const { resolveWeatherIcon } = useWeatherIcon();
 
 const mapStore = useMapStore();
 const { initializeLeaflet, getUserLocation, mapsList } = useMap();
-const { alerts, loading: loadingAlerts, error: alertsError, lastFetchedAt, fetchAlerts } = useAlerts();
+const {
+  weather,
+  loading: loadingWeather,
+  error: weatherError,
+  mqttStatus,
+  lastFetchedAt,
+  fetchCurrentWeather,
+  connectRealtime,
+  disconnectRealtime,
+} = useAlerts();
 const mapRef = ref();
 const mapReady = ref(false);
 
@@ -27,6 +39,32 @@ const formatDate = (value: string | null): string => {
   }
 
   return date.toLocaleString();
+};
+
+const escapeHtml = (value: string): string =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+const createWeatherMarkerIcon = (city: CityWeatherCurrent): L.Icon<L.IconOptions> => {
+  const { iconUrl, key } = resolveWeatherIcon(city.weatherCode, city.cloudCover);
+  const temperatureLabel = `${city.temperatureC.toFixed(1)}°C`;
+  const cityName = escapeHtml(city.cityName);
+
+  return L.divIcon({
+    className: 'weather-marker-wrapper',
+    html: `
+      <div class="weather-marker" title="${cityName}">
+        <img class="weather-marker__icon" src="${iconUrl}" alt="${key}" />
+        <span class="weather-marker__temp">${temperatureLabel}</span>
+      </div>
+    `,
+    iconSize: [56, 72],
+    iconAnchor: [28, 66],
+  }) as unknown as L.Icon<L.IconOptions>;
 };
 
 const moveMapCenter = () => {
@@ -88,7 +126,12 @@ onMounted(async () => {
     mapReady.value = true;
   }
 
-  await fetchAlerts();
+  await fetchCurrentWeather();
+  connectRealtime();
+});
+
+onUnmounted(() => {
+  disconnectRealtime();
 });
 </script>
 
@@ -107,6 +150,13 @@ onMounted(async () => {
         layer-type="base"
         name="map"
       />
+
+      <l-marker
+        v-for="city in weather"
+        :key="`marker-${city.cityKey}-${city.updatedAt}`"
+        :lat-lng="[city.latitude, city.longitude]"
+        :icon="createWeatherMarkerIcon(city)"
+      />
     </l-map>
 
     <div
@@ -115,32 +165,35 @@ onMounted(async () => {
       :class="isMobile ? 'w-[16rem]' : 'w-[20rem]'"
     >
       <div class="flex items-center justify-between border-b px-3 py-2">
-        <h3 class="text-sm font-semibold text-slate-900">Weather Alerts ({{ alerts.length }})</h3>
+        <div>
+          <h3 class="text-sm font-semibold text-slate-900">City Weather ({{ weather.length }})</h3>
+          <p class="text-[10px] text-slate-500">MQTT: {{ mqttStatus }}</p>
+        </div>
         <button
           class="rounded bg-slate-900 px-2 py-1 text-xs text-white hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
-          :disabled="loadingAlerts"
-          @click="fetchAlerts()"
+          :disabled="loadingWeather"
+          @click="fetchCurrentWeather()"
         >
-          {{ loadingAlerts ? 'Loading...' : 'Refresh' }}
+          {{ loadingWeather ? 'Loading...' : 'Refresh' }}
         </button>
       </div>
 
       <div class="max-h-[58vh] overflow-auto p-3">
-        <p v-if="alertsError" class="text-xs text-red-600">{{ alertsError }}</p>
-        <p v-else-if="loadingAlerts" class="text-xs text-slate-500">Loading alerts from backend...</p>
-        <p v-else-if="alerts.length === 0" class="text-xs text-slate-500">No alerts found in database.</p>
+        <p v-if="weatherError" class="text-xs text-red-600">{{ weatherError }}</p>
+        <p v-else-if="loadingWeather" class="text-xs text-slate-500">Loading weather from backend...</p>
+        <p v-else-if="weather.length === 0" class="text-xs text-slate-500">No weather rows found in database.</p>
 
         <ul v-else class="space-y-2">
           <li
-            v-for="alert in alerts"
-            :key="alert.id"
+            v-for="city in weather"
+            :key="city.cityKey"
             class="rounded border border-slate-200 bg-slate-50 p-2"
           >
-            <p class="line-clamp-2 text-xs font-medium text-slate-900">{{ alert.title }}</p>
+            <p class="text-xs font-medium text-slate-900">{{ city.cityName }}</p>
             <p class="mt-1 text-[11px] text-slate-600">
-              {{ alert.provider }} · {{ alert.severity ?? 'unknown severity' }}
+              {{ city.temperatureC.toFixed(1) }}°C · code {{ city.weatherCode }} · clouds {{ city.cloudCover }}%
             </p>
-            <p class="mt-1 text-[11px] text-slate-500">Updated: {{ formatDate(alert.updatedAtSource) }}</p>
+            <p class="mt-1 text-[11px] text-slate-500">Observed: {{ formatDate(city.observedAtSource) }}</p>
           </li>
         </ul>
 
@@ -167,5 +220,37 @@ onMounted(async () => {
 }
 :deep(.leaflet-pane.leaflet-popup-pane) {
   z-index: 100000 !important;
+}
+
+:deep(.weather-marker-wrapper) {
+  background: transparent;
+  border: 0;
+}
+
+:deep(.weather-marker) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+:deep(.weather-marker__icon) {
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.2));
+}
+
+:deep(.weather-marker__temp) {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  border-radius: 999px;
+  padding: 3px 7px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
+  white-space: nowrap;
 }
 </style>

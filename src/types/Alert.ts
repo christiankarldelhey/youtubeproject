@@ -1,22 +1,19 @@
-export type WeatherAlert = {
-  id: number;
-  provider: string;
-  externalId: string;
-  title: string;
-  updatedAtSource: string | null;
-  link: string | null;
-  countryCode: string | null;
-  severity: string | null;
-  payloadRaw: unknown;
+export type CityWeatherCurrent = {
+  cityKey: string;
+  cityName: string;
+  latitude: number;
+  longitude: number;
+  temperatureC: number;
+  weatherCode: number;
+  cloudCover: number;
+  observedAtSource: string | null;
+  timezone: string;
+  rawPayload: unknown;
   fetchedAt: string;
-  createdAt: string;
   updatedAt: string;
 };
 
-export type AlertsResponse = {
+export type WeatherCurrentResponse = {
   total: number;
-  limit: number;
-  offset: number;
-  provider: string | null;
-  alerts: WeatherAlert[];
+  weather: CityWeatherCurrent[];
 };
