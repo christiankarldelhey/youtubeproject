@@ -16,6 +16,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "firebase": "^11.5.0",
+    "hls.js": "^1.6.16",
     "leaflet.markercluster": "^1.5.3",
     "lucide-vue-next": "^0.479.0",
     "mqtt": "^5.10.4",
