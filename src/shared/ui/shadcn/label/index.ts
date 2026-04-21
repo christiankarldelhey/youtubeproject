@@ -1,1 +1,1 @@
-export * from '@/components/ui/label'
+export { default as Label } from './Label.vue'

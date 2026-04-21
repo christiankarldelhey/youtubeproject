@@ -16,6 +16,24 @@ export const mapsList = {
   stamenWatercolor: 'https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg',
 }
 
+export const heartIcon = L.divIcon({
+  html: `
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="red" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>`,
+  className: '',
+  iconSize: [30, 30],
+  iconAnchor: [15, 30],
+  popupAnchor: [0, -30],
+})
+
+export const defaultIcon = L.icon({
+  iconUrl: new URL('leaflet/dist/images/marker-icon.png', import.meta.url).href,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+})
+
 export const initializeLeaflet = () => {
   delete (L.Icon.Default.prototype as { _getIconUrl?: string })._getIconUrl
 
