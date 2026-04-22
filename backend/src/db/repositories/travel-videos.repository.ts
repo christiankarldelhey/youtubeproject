@@ -13,7 +13,10 @@ export type TravelVideoRecord = {
   publishedAt: string | null;
   thumbnail: string | null;
   researchArea: string | null;
+  zoomLevels: number[] | null;
   geom: string | null;
+  latitude?: number;
+  longitude?: number;
   fetchedAt: string;
   updatedAt: string;
 };
@@ -31,6 +34,7 @@ export type UpsertTravelVideoInput = {
   publishedAt: string | null;
   thumbnail: string | null;
   researchArea: string | null;
+  zoomLevels?: number[] | null;
   longitude: number;
   latitude: number;
   fetchedAt: string;
@@ -49,6 +53,7 @@ type TravelVideoRow = {
   published_at: Date | string | null;
   thumbnail: string | null;
   research_area: string | null;
+  zoom_levels: number[] | null;
   geom: string | null;
   fetched_at: Date | string;
   updated_at: Date | string;
@@ -85,6 +90,7 @@ function mapRow(row: TravelVideoRow): TravelVideoRecord {
     publishedAt: toIso(row.published_at),
     thumbnail: row.thumbnail,
     researchArea: row.research_area,
+    zoomLevels: row.zoom_levels,
     geom: row.geom,
     fetchedAt: toIso(row.fetched_at) ?? new Date().toISOString(),
     updatedAt: toIso(row.updated_at) ?? new Date().toISOString(),
@@ -92,6 +98,8 @@ function mapRow(row: TravelVideoRow): TravelVideoRecord {
 }
 
 export async function upsertTravelVideo(input: UpsertTravelVideoInput): Promise<TravelVideoRecord> {
+  const zoomValue = input.zoomLevels?.[0] ?? null;
+  
   const result = await pool.query<TravelVideoRow>(
     `
       INSERT INTO travel_videos (
@@ -107,11 +115,12 @@ export async function upsertTravelVideo(input: UpsertTravelVideoInput): Promise<
         published_at,
         thumbnail,
         research_area,
+        zoom_levels,
         geom,
         fetched_at,
         updated_at
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, ST_SetSRID(ST_MakePoint($13, $14), 4326), $15, NOW())
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, ST_SetSRID(ST_MakePoint($14, $15), 4326), $16, NOW())
       ON CONFLICT (video_id)
       DO UPDATE SET
         title = EXCLUDED.title,
@@ -125,6 +134,11 @@ export async function upsertTravelVideo(input: UpsertTravelVideoInput): Promise<
         published_at = EXCLUDED.published_at,
         thumbnail = EXCLUDED.thumbnail,
         research_area = EXCLUDED.research_area,
+        zoom_levels = CASE
+          WHEN EXCLUDED.zoom_levels IS NULL OR EXCLUDED.zoom_levels = '{}' THEN ARRAY[$17::integer]
+          WHEN $17::integer = ANY(travel_videos.zoom_levels) THEN travel_videos.zoom_levels
+          ELSE array_append(travel_videos.zoom_levels, $17::integer)
+        END,
         geom = EXCLUDED.geom,
         fetched_at = EXCLUDED.fetched_at,
         updated_at = NOW()
@@ -143,9 +157,11 @@ export async function upsertTravelVideo(input: UpsertTravelVideoInput): Promise<
       input.publishedAt,
       input.thumbnail,
       input.researchArea,
+      input.zoomLevels ?? null,
       input.longitude,
       input.latitude,
       input.fetchedAt,
+      zoomValue,
     ],
   );
 
@@ -187,4 +203,91 @@ export async function getTravelVideoById(videoId: string): Promise<TravelVideoRe
   }
 
   return mapRow(result.rows[0]);
+}
+
+export async function countVideosByZoomAndArea(params: {
+  zoom: number;
+  category: string | null;
+  longitude: number;
+  latitude: number;
+  radiusMeters: number;
+}): Promise<number> {
+  const result = await pool.query<{ count: string }>(
+    `
+      SELECT COUNT(*) as count
+      FROM travel_videos
+      WHERE ($2::text IS NULL OR category = $2)
+        AND $1::integer = ANY(zoom_levels)
+        AND ST_DWithin(
+          geom,
+          ST_SetSRID(ST_MakePoint($3, $4), 4326),
+          $5
+        )
+    `,
+    [params.zoom, params.category, params.longitude, params.latitude, params.radiusMeters],
+  );
+
+  return parseInt(result.rows[0].count, 10);
+}
+
+export async function listVideosByZoomAndArea(params: {
+  zoom: number;
+  category: string | null;
+  longitude: number;
+  latitude: number;
+  radiusMeters: number;
+  limit?: number;
+}): Promise<TravelVideoRecord[]> {
+  type TravelVideoRowWithCoords = TravelVideoRow & {
+    longitude: number;
+    latitude: number;
+  };
+
+  const result = await pool.query<TravelVideoRowWithCoords>(
+    `
+      SELECT 
+        video_id,
+        title,
+        channel,
+        description,
+        tags,
+        topic_yt_categories,
+        category,
+        view_count,
+        like_count,
+        published_at,
+        thumbnail,
+        research_area,
+        zoom_levels,
+        ST_X(geom) as longitude,
+        ST_Y(geom) as latitude,
+        geom,
+        fetched_at,
+        updated_at
+      FROM travel_videos
+      WHERE ($2::text IS NULL OR category = $2)
+        AND $1::integer = ANY(zoom_levels)
+        AND ST_DWithin(
+          geom,
+          ST_SetSRID(ST_MakePoint($3, $4), 4326),
+          $5
+        )
+      ORDER BY published_at DESC NULLS LAST, fetched_at DESC
+      LIMIT $6
+    `,
+    [
+      params.zoom,
+      params.category,
+      params.longitude,
+      params.latitude,
+      params.radiusMeters,
+      params.limit ?? 100,
+    ],
+  );
+
+  return result.rows.map((row) => ({
+    ...mapRow(row),
+    longitude: row.longitude,
+    latitude: row.latitude,
+  }));
 }

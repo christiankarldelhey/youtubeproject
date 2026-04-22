@@ -1,5 +1,9 @@
 import axios from 'axios';
-import { upsertTravelVideo } from '../db/repositories/travel-videos.repository.js';
+import {
+  upsertTravelVideo,
+  countVideosByZoomAndArea,
+  listVideosByZoomAndArea,
+} from '../db/repositories/travel-videos.repository.js';
 
 const SEARCH_ENDPOINT = 'https://youtube.googleapis.com/youtube/v3/search';
 const DETAILS_ENDPOINT = 'https://youtube.googleapis.com/youtube/v3/videos';
@@ -73,6 +77,11 @@ function calculateRadiusFromZoom(zoom: number): string {
   return `${radiusKm}km`;
 }
 
+function calculateRadiusMeters(zoom: number): number {
+  const radiusKm = Math.pow(2, 15 - zoom) * 10;
+  return radiusKm * 1000;
+}
+
 async function fetchYoutubeSearch(
   params: YoutubeSearchParams,
 ): Promise<YoutubeVideoItem[]> {
@@ -130,6 +139,7 @@ export async function fetchAndIngestVideos(
   const detailedVideos = await fetchYoutubeDetails(videoIds, params.apiKey);
 
   const fetchedAt = new Date().toISOString();
+  const zoom = params.currentZoom ?? 10;
 
   for (const detailedVideo of detailedVideos) {
     const viewCount = detailedVideo.statistics?.viewCount
@@ -152,11 +162,14 @@ export async function fetchAndIngestVideos(
       publishedAt: detailedVideo.snippet.publishedAt,
       thumbnail: detailedVideo.snippet.thumbnails.high.url,
       researchArea: null,
+      zoomLevels: [zoom],
       longitude: detailedVideo.recordingDetails?.location?.longitude ?? 0,
       latitude: detailedVideo.recordingDetails?.location?.latitude ?? 0,
       fetchedAt,
     });
   }
+
+  console.log(`[api] Ingested ${detailedVideos.length} new videos for zoom ${zoom}`);
 
   return detailedVideos.map((video) => ({
     position: [
@@ -175,6 +188,57 @@ export async function fetchAndIngestVideos(
 export async function searchVideos(
   params: YoutubeSearchParams,
 ): Promise<{ total: number; videos: VideoMarker[] }> {
+  const zoom = params.currentZoom ?? 10;
+  const longitude = params.currentMapPosition?.[1] ?? 0;
+  const latitude = params.currentMapPosition?.[0] ?? 0;
+  const radiusMeters = calculateRadiusMeters(zoom);
+  const CACHE_THRESHOLD = 40;
+
+  // Check cache first
+  const cachedCount = await countVideosByZoomAndArea({
+    zoom,
+    category: params.category ?? null,
+    longitude,
+    latitude,
+    radiusMeters,
+  });
+
+  if (cachedCount >= CACHE_THRESHOLD) {
+    console.log(
+      `[cache] Using cached results: ${cachedCount} videos for zoom ${zoom}`,
+    );
+    const cachedVideos = await listVideosByZoomAndArea({
+      zoom,
+      category: params.category ?? null,
+      longitude,
+      latitude,
+      radiusMeters,
+      limit: 100,
+    });
+
+    const videoMarkers: VideoMarker[] = cachedVideos.map((video) => ({
+      position: [
+        video.latitude ?? 0,
+        video.longitude ?? 0,
+      ] as [number, number],
+      location: video.researchArea ?? 'Unknown',
+      title: video.title,
+      description: video.description ?? '',
+      videoId: video.videoId,
+      thumbnail: video.thumbnail ?? '',
+      favorited: false,
+    }));
+
+    return {
+      total: videoMarkers.length,
+      videos: videoMarkers,
+    };
+  }
+
+  // Cache miss - call API
+  console.log(
+    `[api] Calling YouTube API (cache has ${cachedCount} videos, threshold: ${CACHE_THRESHOLD})`,
+  );
   const videos = await fetchAndIngestVideos(params);
   return {
     total: videos.length,
