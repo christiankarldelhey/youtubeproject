@@ -15,7 +15,7 @@ const envSchema = z.object({
   MQTT_TOPIC_PREFIX: z.string().default('weather'),
   DB_HOST: z.string().default('localhost'),
   DB_PORT: z.coerce.number().int().positive().default(5432),
-  DB_NAME: z.string().default('weather-db'),
+  DB_NAME: z.string().default('travel-db'),
   DB_USER: z.string().default(process.env.USER ?? 'postgres'),
   DB_PASSWORD: z.string().default(''),
   YOUTUBE_API_KEY: z.string().optional(),

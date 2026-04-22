@@ -9,5 +9,4 @@ export type {
   SearchOption,
   VideoMarker,
 } from './model/youtube-video.types'
-export { calculateRadiusFromZoom } from './lib/radius'
-export { fetchVideoDetails, fetchYoutubeMarkers, fetchVideosFromBackend } from './api/youtube.service'
+export { fetchVideosFromBackend } from './api/youtube.service'
