@@ -27,6 +27,14 @@ export const heartIcon = L.divIcon({
   popupAnchor: [0, -30],
 })
 
+export const videoIcon = L.divIcon({
+  html: `<div style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#ef4444;color:#ffffff;border:2px solid #ffffff;box-shadow:0 2px 6px rgba(0,0,0,.35);font-size:14px;line-height:1;">▶</div>`,
+  className: '',
+  iconSize: [30, 30],
+  iconAnchor: [15, 30],
+  popupAnchor: [0, -28],
+})
+
 export const defaultIcon = L.icon({
   iconUrl: new URL('leaflet/dist/images/marker-icon.png', import.meta.url).href,
   iconSize: [25, 41],

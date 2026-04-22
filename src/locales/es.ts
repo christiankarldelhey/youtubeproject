@@ -2,6 +2,9 @@ export default {
     search_placeholder: "Buscar una ubicación...",
   
     videos_in_area: "Videos en esta área",
+    research_in_area: "Research in this area",
+    poi_unknown_name: "POI desconocido",
+    poi_unknown_description: "Sin descripción disponible",
   
     login_title: "Iniciar sesión",
     sign_up_title: "Registrarse",
