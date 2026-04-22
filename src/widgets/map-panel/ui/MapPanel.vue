@@ -38,6 +38,8 @@ const {
   setShowSearchButton,
   setSelectedOption,
   selectVideo,
+  setDialogOpen,
+  setMobileVideoDetail,
 } = useYoutubeVideos()
 const { pois, loadingPois, poisError, fetchPoisByCurrentViewport, clearPois } = useSeePois()
 
@@ -188,11 +190,13 @@ const onMapReady = () => {
   }
 }
 
-const openVideo = () => {
-  mapRef.value?.leafletObject?.closePopup()
-}
-
 const selectMarker = (video: VideoMarker) => {
+  mapRef.value?.leafletObject?.closePopup()
+  if (!isMobile.value) {
+    setDialogOpen(true)
+  } else {
+    setMobileVideoDetail(true)
+  }
   selectVideo(video)
 }
 
@@ -314,8 +318,17 @@ onMounted(async () => {
             :lat-lng="marker.position ?? mapStore.center"
             :icon="getMarkerIcon(marker)"
             :options="{ pane: 'videoMarkersPane' }"
-            @click="selectMarker(marker)"
-          />
+          >
+            <l-popup class="relative z-100001 cursor-pointer" @click="selectMarker(marker)">
+              <span class="z-9999 mb-2 flex flex-row text-primary">
+                <MapPin class="z-10001 mr-1 h-4 w-4" /> {{ marker.location?.toUpperCase() }}
+              </span>
+              <div class="relative h-36 w-64 overflow-hidden rounded">
+                <img :src="marker.thumbnail" alt="Video Thumbnail" class="h-full w-full object-cover" />
+              </div>
+              <p>{{ marker.title }}</p>
+            </l-popup>
+          </l-marker>
         </template>
 
         <template v-else>
@@ -325,9 +338,8 @@ onMounted(async () => {
             :lat-lng="marker.position ?? mapStore.center"
             :icon="getMarkerIcon(marker)"
             :options="{ pane: 'videoMarkersPane' }"
-            @click="selectMarker(marker)"
           >
-            <l-popup class="relative z-100001 cursor-pointer" @click="openVideo()">
+            <l-popup class="relative z-100001 cursor-pointer" @click="selectMarker(marker)">
               <span class="z-9999 mb-2 flex flex-row text-primary">
                 <MapPin class="z-10001 mr-1 h-4 w-4" /> {{ marker.location?.toUpperCase() }}
               </span>
