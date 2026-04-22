@@ -73,13 +73,18 @@ interface VideoMarker {
 }
 
 function calculateRadiusFromZoom(zoom: number): string {
-  const radiusKm = Math.pow(2, 15 - zoom) * 10;
-  return `${radiusKm}km`;
+  const reductionFactor = 0.5;
+  const radiusKm = (40075 / Math.pow(2, zoom)) * reductionFactor;
+  const limitedRadius = Math.min(Math.ceil(radiusKm), 1000);
+  console.log(`[radius] Zoom ${zoom} -> radius: ${limitedRadius}km (raw: ${radiusKm.toFixed(2)}km)`);
+  return `${limitedRadius}km`;
 }
 
 function calculateRadiusMeters(zoom: number): number {
-  const radiusKm = Math.pow(2, 15 - zoom) * 10;
-  return radiusKm * 1000;
+  const reductionFactor = 0.5;
+  const radiusKm = (40075 / Math.pow(2, zoom)) * reductionFactor;
+  const limitedRadius = Math.min(Math.ceil(radiusKm), 1000);
+  return limitedRadius * 1000;
 }
 
 async function fetchYoutubeSearch(
@@ -102,6 +107,12 @@ async function fetchYoutubeSearch(
     videoSyndicated: 'true',
     videoDuration: 'medium',
   };
+
+  console.log(`[youtube-api] Search params:`, {
+    location: queryParams.location,
+    locationRadius: queryParams.locationRadius,
+    zoom: params.currentZoom,
+  });
 
   const { data } = await axios.get<{ items: YoutubeVideoItem[] }>(
     SEARCH_ENDPOINT,
@@ -193,6 +204,13 @@ export async function searchVideos(
   const latitude = params.currentMapPosition?.[0] ?? 0;
   const radiusMeters = calculateRadiusMeters(zoom);
   const CACHE_THRESHOLD = 40;
+
+  console.log(`[cache-search] Searching cache:`, {
+    zoom,
+    latitude,
+    longitude,
+    radiusMeters: `${(radiusMeters / 1000).toFixed(2)}km`,
+  });
 
   // Check cache first
   const cachedCount = await countVideosByZoomAndArea({

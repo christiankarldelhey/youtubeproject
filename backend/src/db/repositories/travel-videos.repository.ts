@@ -219,8 +219,8 @@ export async function countVideosByZoomAndArea(params: {
       WHERE ($2::text IS NULL OR category = $2)
         AND $1::integer = ANY(zoom_levels)
         AND ST_DWithin(
-          geom,
-          ST_SetSRID(ST_MakePoint($3, $4), 4326),
+          ST_Transform(geom, 3857),
+          ST_Transform(ST_SetSRID(ST_MakePoint($3, $4), 4326), 3857),
           $5
         )
     `,
@@ -245,7 +245,7 @@ export async function listVideosByZoomAndArea(params: {
 
   const result = await pool.query<TravelVideoRowWithCoords>(
     `
-      SELECT 
+      SELECT
         video_id,
         title,
         channel,
@@ -268,8 +268,8 @@ export async function listVideosByZoomAndArea(params: {
       WHERE ($2::text IS NULL OR category = $2)
         AND $1::integer = ANY(zoom_levels)
         AND ST_DWithin(
-          geom,
-          ST_SetSRID(ST_MakePoint($3, $4), 4326),
+          ST_Transform(geom, 3857),
+          ST_Transform(ST_SetSRID(ST_MakePoint($3, $4), 4326), 3857),
           $5
         )
       ORDER BY published_at DESC NULLS LAST, fetched_at DESC

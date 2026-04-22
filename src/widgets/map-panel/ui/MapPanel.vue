@@ -16,10 +16,12 @@ import {
   heartIcon,
   videoIcon,
 } from '@/entities/map'
-import { getPoiTopicEmoji, getPoiTopicIcon } from '@/entities/poi'
-import type { OverpassBbox, PoiMarker } from '@/entities/poi'
+// Temporarily disabled POI search
+// import { getPoiTopicEmoji, getPoiTopicIcon } from '@/entities/poi'
+// import type { OverpassBbox, PoiMarker } from '@/entities/poi'
 import type { VideoMarker } from '@/entities/youtube-video'
-import { useSeePois } from '@/features/see-pois'
+// Temporarily disabled POI search
+// import { useSeePois } from '@/features/see-pois'
 import { useYoutubeVideos } from '@/features/youtube-videos'
 import { useYoutubeFavorites } from '@/features/youtube-favorites'
 import { useYoutubeSearchSettings } from '@/features/youtube-search-settings'
@@ -41,7 +43,8 @@ const {
   setDialogOpen,
   setMobileVideoDetail,
 } = useYoutubeVideos()
-const { pois, loadingPois, poisError, fetchPoisByCurrentViewport, clearPois } = useSeePois()
+// Temporarily disabled POI search
+// const { pois, loadingPois, poisError, fetchPoisByCurrentViewport, clearPois } = useSeePois()
 
 const { favorites, fetchFavorites } = useYoutubeFavorites()
 const { searchQuery } = useYoutubeSearchSettings()
@@ -63,16 +66,20 @@ const videoMarkerList = computed<VideoMarker[]>(() => {
   return videosWithFavoriteState
 })
 
-const poiMarkerList = computed<PoiMarker[]>(() => {
-  if (selectedOption.value.value === 'favorites') {
-    return []
-  }
+// Temporarily disabled POI search
+// const poiMarkerList = computed<PoiMarker[]>(() => {
+//   if (selectedOption.value.value === 'favorites') {
+//     return []
+//   }
+//
+//   return pois.value
+// })
 
-  return pois.value
-})
-
-const visibleError = computed(() => error.value ?? poisError.value)
-const mapLoading = computed(() => loading.value || loadingPois.value)
+// Temporarily disabled POI search
+// const visibleError = computed(() => error.value ?? poisError.value)
+const visibleError = computed(() => error.value)
+// const mapLoading = computed(() => loading.value || loadingPois.value)
+const mapLoading = computed(() => loading.value)
 
 const videoClusterOptions = {
   clusterPane: 'videoClustersPane',
@@ -88,20 +95,21 @@ const videoClusterOptions = {
   },
 }
 
-const poiClusterOptions = {
-  clusterPane: 'poiClustersPane',
-  iconCreateFunction: (cluster: { getChildCount: () => number }) => {
-    const count = cluster.getChildCount()
-    const iconLabel = getPoiTopicEmoji(searchQuery.value.value)
-
-    return L.divIcon({
-      html: `<div style="display:flex;align-items:center;justify-content:center;gap:4px;width:48px;height:48px;border-radius:9999px;background:#6639de;border:2px solid #ffffff;color:#ffffff;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.35);"><span style="font-size:14px;line-height:1">${iconLabel}</span><span style="font-size:12px;line-height:1">${count}</span></div>`,
-      className: 'custom-cluster-icon',
-      iconSize: [48, 48],
-      iconAnchor: [24, 24],
-    })
-  },
-}
+// Temporarily disabled POI search
+// const poiClusterOptions = {
+//   clusterPane: 'poiClustersPane',
+//   iconCreateFunction: (cluster: { getChildCount: () => number }) => {
+//     const count = cluster.getChildCount()
+//     const iconLabel = getPoiTopicEmoji(searchQuery.value.value)
+//
+//     return L.divIcon({
+//       html: `<div style="display:flex;align-items:center;justify-content:center;gap:4px;width:48px;height:48px;border-radius:9999px;background:#6639de;border:2px solid #ffffff;color:#ffffff;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.35);"><span style="font-size:14px;line-height:1">${iconLabel}</span><span style="font-size:12px;line-height:1">${count}</span></div>`,
+//       className: 'custom-cluster-icon',
+//       iconSize: [48, 48],
+//       iconAnchor: [24, 24],
+//     })
+//   },
+// }
 
 const fetchVideos = async () => {
   await fetchYoutubeVideos({
@@ -119,18 +127,20 @@ const fetchVideos = async () => {
   }
 }
 
-const getCurrentBbox = (): OverpassBbox | null => {
-  const leafletMap = mapRef.value?.leafletObject
-  if (!leafletMap) {
-    return null
-  }
-
-  const bounds = leafletMap.getBounds()
-  return [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()]
-}
+// Temporarily disabled POI search
+// const getCurrentBbox = (): OverpassBbox | null => {
+//   const leafletMap = mapRef.value?.leafletObject
+//   if (!leafletMap) {
+//     return null
+//   }
+//
+//   const bounds = leafletMap.getBounds()
+//   return [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()]
+// }
 
 const researchInArea = async () => {
-  const bbox = getCurrentBbox()
+  // Temporarily disabled POI search
+  // const bbox = getCurrentBbox()
 
   await Promise.all([
     fetchYoutubeVideos({
@@ -140,7 +150,8 @@ const researchInArea = async () => {
       searchQuery: searchQuery.value.value,
       category: searchQuery.value.value,
     }),
-    bbox ? fetchPoisByCurrentViewport(bbox, searchQuery.value.value) : Promise.resolve(),
+    // Temporarily disabled POI search
+    // bbox ? fetchPoisByCurrentViewport(bbox, searchQuery.value.value) : Promise.resolve(),
   ])
 
   setShowSearchButton(false)
@@ -206,9 +217,10 @@ const getMarkerIcon = (video: VideoMarker): L.Icon<L.IconOptions> => {
   return (video.favorited ? heartIcon : videoIcon) as unknown as L.Icon<L.IconOptions>
 }
 
-const getPoiMarkerIcon = (): L.Icon<L.IconOptions> => {
-  return getPoiTopicIcon(searchQuery.value.value) as unknown as L.Icon<L.IconOptions>
-}
+// Temporarily disabled POI search
+// const getPoiMarkerIcon = (): L.Icon<L.IconOptions> => {
+//   return getPoiTopicIcon(searchQuery.value.value) as unknown as L.Icon<L.IconOptions>
+// }
 
 watch(
   () => mapStore.flyToTarget,
@@ -239,7 +251,8 @@ watch(
 onMounted(async () => {
   initializeLeaflet()
   await fetchFavorites()
-  clearPois()
+  // Temporarily disabled POI search
+  // clearPois()
 
   try {
     const { latitude, longitude } = await getUserLocation()
@@ -267,47 +280,48 @@ onMounted(async () => {
     >
       <l-tile-layer :url="mapsList.carto" layer-type="base" name="map" />
 
-      <l-marker-cluster-group
-        :options="poiClusterOptions"
-        :key="
-          poiMarkerList.length +
-          JSON.stringify(poiMarkerList.map((item) => item.id))
-        "
-      >
-        <template v-if="isMobile">
-          <l-marker
-            v-for="poi in poiMarkerList"
-            :key="poi.id"
-            :lat-lng="poi.position"
-            :icon="getPoiMarkerIcon()"
-            :options="{ pane: 'poiMarkersPane' }"
-          >
-            <l-popup class="relative z-100001">
-              <span class="z-9999 mb-2 flex flex-row text-primary">
-                <MapPin class="z-10001 mr-1 h-4 w-4" /> {{ poi.name.toUpperCase() }}
-              </span>
-              <p>{{ poi.description }}</p>
-            </l-popup>
-          </l-marker>
-        </template>
+      <!-- Temporarily disabled POI search -->
+      <!-- <l-marker-cluster-group -->
+      <!--   :options="poiClusterOptions" -->
+      <!--   :key=" -->
+      <!--     poiMarkerList.length + -->
+      <!--     JSON.stringify(poiMarkerList.map((item) => item.id)) -->
+      <!--   " -->
+      <!-- > -->
+      <!--   <template v-if="isMobile"> -->
+      <!--     <l-marker -->
+      <!--       v-for="poi in poiMarkerList" -->
+      <!--       :key="poi.id" -->
+      <!--       :lat-lng="poi.position" -->
+      <!--       :icon="getPoiMarkerIcon()" -->
+      <!--       :options="{ pane: 'poiMarkersPane' }" -->
+      <!--     > -->
+      <!--       <l-popup class="relative z-100001"> -->
+      <!--         <span class="z-9999 mb-2 flex flex-row text-primary"> -->
+      <!--           <MapPin class="z-10001 mr-1 h-4 w-4" /> {{ poi.name.toUpperCase() }} -->
+      <!--         </span> -->
+      <!--         <p>{{ poi.description }}</p> -->
+      <!--       </l-popup> -->
+      <!--     </l-marker> -->
+      <!--   </template> -->
 
-        <template v-else>
-          <l-marker
-            v-for="poi in poiMarkerList"
-            :key="poi.id"
-            :lat-lng="poi.position"
-            :icon="getPoiMarkerIcon()"
-            :options="{ pane: 'poiMarkersPane' }"
-          >
-            <l-popup class="relative z-100001">
-              <span class="z-9999 mb-2 flex flex-row text-primary">
-                <MapPin class="z-10001 mr-1 h-4 w-4" /> {{ poi.name.toUpperCase() }}
-              </span>
-              <p>{{ poi.description }}</p>
-            </l-popup>
-          </l-marker>
-        </template>
-      </l-marker-cluster-group>
+      <!--   <template v-else> -->
+      <!--     <l-marker -->
+      <!--       v-for="poi in poiMarkerList" -->
+      <!--       :key="poi.id" -->
+      <!--       :lat-lng="poi.position" -->
+      <!--       :icon="getPoiMarkerIcon()" -->
+      <!--       :options="{ pane: 'poiMarkersPane' }" -->
+      <!--     > -->
+      <!--       <l-popup class="relative z-100001"> -->
+      <!--         <span class="z-9999 mb-2 flex flex-row text-primary"> -->
+      <!--           <MapPin class="z-10001 mr-1 h-4 w-4" /> {{ poi.name.toUpperCase() }} -->
+      <!--         </span> -->
+      <!--         <p>{{ poi.description }}</p> -->
+      <!--       </l-popup> -->
+      <!--     </l-marker> -->
+      <!--   </template> -->
+      <!-- </l-marker-cluster-group> -->
 
       <l-marker-cluster-group
         :options="videoClusterOptions"
