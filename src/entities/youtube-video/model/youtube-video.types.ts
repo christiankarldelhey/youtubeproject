@@ -1,11 +1,14 @@
 export interface VideoSnippet {
   title: string
   description: string
+  channelTitle: string
+  publishedAt: string
   thumbnails: {
     default: { url: string }
     medium: { url: string }
     high: { url: string }
   }
+  tags?: string[]
 }
 
 export interface RecordingDetails {

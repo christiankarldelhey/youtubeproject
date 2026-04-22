@@ -10,6 +10,7 @@ import { calculateRadiusFromZoom } from '../lib/radius'
 
 const SEARCH_ENDPOINT = 'https://youtube.googleapis.com/youtube/v3/search'
 const DETAILS_ENDPOINT = 'https://youtube.googleapis.com/youtube/v3/videos'
+const BACKEND_ENDPOINT = 'http://localhost:4000'
 
 export const fetchVideoDetails = async (
   videoIds: string[],
@@ -71,4 +72,25 @@ export const fetchYoutubeMarkers = async ({
       favorited: false,
     }
   })
+}
+
+export const fetchVideosFromBackend = async ({
+  apiKey,
+  currentMapPosition,
+  currentZoom,
+  searchQuery,
+  category,
+}: FetchYoutubeParams & { category?: string }): Promise<VideoMarker[]> => {
+  const { data } = await axios.post<{ total: number; videos: VideoMarker[] }>(
+    `${BACKEND_ENDPOINT}/api/videos/search`,
+    {
+      apiKey,
+      currentMapPosition,
+      currentZoom,
+      searchQuery,
+      category,
+    },
+  )
+
+  return data.videos
 }

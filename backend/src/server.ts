@@ -2,13 +2,9 @@ import cors from 'cors';
 import express from 'express';
 import { env } from './config/env.js';
 import { checkDbConnection, pool } from './db/pool.js';
-import { createWeatherPublisher } from './mqtt/publisher.js';
-import { getCurrentWeather, ingestCurrentWeather } from './services/weather-ingestion.service.js';
+import { searchVideos } from './services/youtube-ingestion.service.js';
 
 const app = express();
-const weatherPublisher = createWeatherPublisher();
-let weatherJobTimer: NodeJS.Timeout | null = null;
-let weatherIngestInProgress = false;
 
 app.use(
   cors({
@@ -34,77 +30,38 @@ app.get('/health', async (_req, res) => {
   }
 });
 
-async function runWeatherIngest(source: 'manual' | 'scheduler') {
-  if (weatherIngestInProgress) {
-    return null;
-  }
-
-  weatherIngestInProgress = true;
-
+app.post('/api/videos/search', async (req, res) => {
   try {
-    const summary = await ingestCurrentWeather((record) => weatherPublisher.publishCurrent(record));
-    return {
-      source,
-      ...summary,
-    };
-  } catch (error) {
-    console.error('[weather] ingestion failed', error);
-    throw error;
-  } finally {
-    weatherIngestInProgress = false;
-  }
-}
+    const { apiKey, currentMapPosition, currentZoom, searchQuery, category } = req.body;
 
-function startWeatherScheduler() {
-  const intervalMs = env.WEATHER_INGEST_INTERVAL_SECONDS * 1000;
-  weatherJobTimer = setInterval(() => {
-    void runWeatherIngest('scheduler');
-  }, intervalMs);
-}
-
-app.post('/weather/ingest', async (_req, res) => {
-  try {
-    const summary = await runWeatherIngest('manual');
-
-    if (summary === null) {
-      return res.status(202).json({
-        status: 'skipped',
-        reason: 'ingestion already in progress',
+    if (!apiKey) {
+      return res.status(400).json({
+        error: 'Missing required field: apiKey',
       });
     }
 
-    return res.status(200).json(summary);
+    const result = await searchVideos({
+      apiKey,
+      currentMapPosition,
+      currentZoom,
+      searchQuery,
+      category,
+    });
+
+    return res.status(200).json(result);
   } catch (error) {
     return res.status(502).json({
-      error: 'Failed to ingest current weather',
+      error: 'Failed to search videos',
       details: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 });
 
-app.get('/weather/current', async (_req, res) => {
-  try {
-    const weather = await getCurrentWeather();
-
-    return res.status(200).json({
-      total: weather.length,
-      weather,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      error: 'Failed to read current weather',
-      details: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
+// Weather endpoints temporarily disabled
+// app.post('/weather/ingest', async (_req, res) => { ... });
+// app.get('/weather/current', async (_req, res) => { ... });
 
 const shutdown = async () => {
-  if (weatherJobTimer) {
-    clearInterval(weatherJobTimer);
-    weatherJobTimer = null;
-  }
-
-  await weatherPublisher.disconnect();
   await pool.end();
   process.exit(0);
 };
@@ -115,11 +72,8 @@ process.on('SIGTERM', shutdown);
 app.listen(env.PORT, async () => {
   try {
     await checkDbConnection();
-    await weatherPublisher.connect();
-    startWeatherScheduler();
     console.log(`Backend running on http://localhost:${env.PORT}`);
     console.log('PostgreSQL connection: OK');
-    console.log(`[weather] scheduler interval: ${env.WEATHER_INGEST_INTERVAL_SECONDS}s`);
   } catch (error) {
     console.error('Backend startup checks failed', error);
   }

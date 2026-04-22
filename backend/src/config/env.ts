@@ -18,6 +18,7 @@ const envSchema = z.object({
   DB_NAME: z.string().default('weather-db'),
   DB_USER: z.string().default(process.env.USER ?? 'postgres'),
   DB_PASSWORD: z.string().default(''),
+  YOUTUBE_API_KEY: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);

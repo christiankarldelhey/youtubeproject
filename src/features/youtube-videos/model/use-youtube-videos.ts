@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import axios from 'axios'
-import { fetchYoutubeMarkers } from '@/entities/youtube-video'
+import { fetchVideosFromBackend } from '@/entities/youtube-video'
 import type { FetchYoutubeParams, VideoMarker } from '@/entities/youtube-video'
 
 type SidebarSelection = 'search' | 'favorites'
@@ -23,7 +23,9 @@ const selectedOption = ref<SelectedOption>({
 })
 
 export function useYoutubeVideos() {
-  const fetchYoutubeVideos = async (params: FetchYoutubeParams): Promise<void> => {
+  const fetchYoutubeVideos = async (
+    params: FetchYoutubeParams & { category?: string },
+  ): Promise<void> => {
     if (!params.apiKey) {
       error.value = 'VITE_YOUTUBE_API_KEY is missing.'
       videos.value = []
@@ -34,7 +36,7 @@ export function useYoutubeVideos() {
     error.value = null
 
     try {
-      videos.value = await fetchYoutubeMarkers(params)
+      videos.value = await fetchVideosFromBackend(params)
     } catch (err) {
       if (axios.isAxiosError(err)) {
         error.value = err.message

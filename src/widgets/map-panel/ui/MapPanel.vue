@@ -109,6 +109,7 @@ const fetchVideos = async () => {
     currentMapPosition: mapStore.center,
     currentZoom: mapStore.zoom,
     searchQuery: searchQuery.value.value,
+    category: searchQuery.value.value,
   })
 
   setShowSearchButton(false)
@@ -137,6 +138,7 @@ const researchInArea = async () => {
       currentMapPosition: mapStore.center,
       currentZoom: mapStore.zoom,
       searchQuery: searchQuery.value.value,
+      category: searchQuery.value.value,
     }),
     bbox ? fetchPoisByCurrentViewport(bbox, searchQuery.value.value) : Promise.resolve(),
   ])
