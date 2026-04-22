@@ -18,6 +18,13 @@ export interface RecordingDetails {
   locationDescription?: string
 }
 
+export interface Statistics {
+  viewCount: string
+  likeCount: string
+  commentCount: string
+  favoriteCount?: string
+}
+
 export interface VideoItem {
   id: {
     videoId: string
@@ -32,6 +39,7 @@ export interface DetailedVideoItem {
   topicDetails?: {
     topicCategories: string[]
   }
+  statistics?: Statistics
 }
 
 export interface YoutubeApiResponse {

@@ -20,7 +20,7 @@ export const fetchVideoDetails = async (
   }
 
   const params = {
-    part: 'snippet,recordingDetails,topicDetails',
+    part: 'snippet,recordingDetails,topicDetails,statistics',
     id: videoIds.join(','),
     key: apiKey,
   }
