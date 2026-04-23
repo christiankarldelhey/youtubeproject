@@ -117,7 +117,7 @@ const fetchVideos = async () => {
     currentMapPosition: mapStore.center,
     currentZoom: mapStore.zoom,
     searchQuery: searchQuery.value.value,
-    category: searchQuery.value.value,
+    category: searchQuery.value.name,
   })
 
   setShowSearchButton(false)
@@ -148,7 +148,7 @@ const researchInArea = async () => {
       currentMapPosition: mapStore.center,
       currentZoom: mapStore.zoom,
       searchQuery: searchQuery.value.value,
-      category: searchQuery.value.value,
+      category: searchQuery.value.name,
     }),
     // Temporarily disabled POI search
     // bbox ? fetchPoisByCurrentViewport(bbox, searchQuery.value.value) : Promise.resolve(),

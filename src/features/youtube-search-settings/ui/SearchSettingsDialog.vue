@@ -47,7 +47,7 @@ const saveSettings = () => {
         <div v-for="option in searchOptions" :key="option.value" class="flex flex-row">
           <Component :is="iconMap[option.icon as keyof typeof iconMap]" class="mr-2 h-5 w-5" />
           <RadioGroupItem class="h-5 w-5" :value="option.value" :id="option.value" />
-          <Label :for="option.value" class="ml-2 pt-1">{{ $t(option.value) }}</Label>
+          <Label :for="option.value" class="ml-2 pt-1">{{ option.name }}</Label>
         </div>
       </RadioGroup>
 

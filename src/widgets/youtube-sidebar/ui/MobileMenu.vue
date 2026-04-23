@@ -36,7 +36,7 @@ watch(
             <div v-if="selectedOption.value === 'search'" class="truncate text-sm text-primary">
               <span class="flex flex-row items-center gap-2 font-semibold text-primary">
                 <component :is="iconMap[searchQuery.icon as keyof typeof iconMap]" class="h-4 w-4" />
-                {{ $t('sidebar.search_results', { label: $t(searchQuery.value) }) }}
+                {{ $t('sidebar.search_results', { label: (searchQuery.value as any).name }) }}
               </span>
             </div>
             <span v-if="selectedOption.value === 'favorites'" class="flex flex-row items-center gap-2 font-semibold text-primary">

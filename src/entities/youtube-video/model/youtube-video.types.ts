@@ -63,6 +63,7 @@ export interface FetchYoutubeParams {
 
 export interface SearchOption {
   value: string
+  name: string
   icon: string
 }
 

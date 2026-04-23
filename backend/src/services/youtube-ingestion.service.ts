@@ -95,7 +95,7 @@ async function fetchYoutubeSearch(
     part: 'snippet',
     relevanceLanguage: 'es',
     maxResults: params.maxResults ?? 50,
-    q: params.searchQuery ?? 'travel',
+    q: params.searchQuery ?? '"travel vlog"|"travel guide"|trip|viaje|"city guide" "walking tour"|"neighborhood guide"|"best area"|"best neighborhood" -shorts -music -reaction -podcast',
     type: 'video',
     key: params.apiKey,
     location: params.currentMapPosition

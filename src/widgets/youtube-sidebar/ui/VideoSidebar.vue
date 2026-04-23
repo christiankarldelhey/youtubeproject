@@ -79,7 +79,7 @@ watch(
           <div class="sticky top-0 z-10 flex cursor-pointer flex-row justify-between border-b bg-background p-4 text-primary shadow-sm">
             <span v-if="selectedOption.value === 'search'" class="flex flex-row items-center gap-2 font-semibold text-primary">
               <component :is="iconMap[searchQuery.icon as keyof typeof iconMap]" class="h-4 w-4" />
-              {{ $t('sidebar.search_results', { label: $t(searchQuery.value) }) }}
+              {{ $t('sidebar.search_results', { label: (searchQuery.value as any).name }) }}
             </span>
             <span v-if="selectedOption.value === 'favorites'" class="flex flex-row items-center gap-2 font-semibold text-primary">
               <HeartIcon class="h-4 w-4" /> {{ $t('sidebar.favorites') }}
