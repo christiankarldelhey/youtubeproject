@@ -46,5 +46,13 @@ export default {
     onboarding_step2_title: "¿Qué actividades te interesan?",
     onboarding_continue: "Continuar",
     onboarding_start: "Comenzar a explorar",
+    research_area_title: "Crear Área de Investigación",
+    research_area_name: "Nombre",
+    research_area_name_placeholder: "ej. Viaje a la Occitania",
+    research_area_bbox: "Bbox",
+    research_area_zoom_level: "Nivel de Zoom",
+    research_area_cancel: "Cancelar",
+    research_area_create: "Crear",
+    research_area_exit: "Salir del Área de Investigación",
   };
   

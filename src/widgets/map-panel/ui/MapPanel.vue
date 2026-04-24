@@ -27,11 +27,35 @@ import { useYoutubeFavorites } from '@/features/youtube-favorites'
 import { useYoutubeSearchSettings } from '@/features/youtube-search-settings'
 import { useSearchPreferencesStore } from '@/shared/model/search-preferences.store'
 import { OnboardingDialog } from '@/features/onboarding'
+import { CreateResearchAreaDialog } from '@/features/research-area'
+import { useResearchAreaStore } from '@/entities/research-area'
 
 const { isMobile } = useMobile()
 const mapStore = useMapStore()
 const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY
 const searchPreferences = useSearchPreferencesStore()
+const researchAreaStore = useResearchAreaStore()
+
+const showCreateResearchAreaDialog = ref(false)
+const selectedBbox = ref<[number, number, number, number] | null>(null)
+const selectedZoomLevel = ref(0)
+
+const handleSelectArea = () => {
+  const leafletMap = mapRef.value?.leafletObject
+  if (!leafletMap) return
+
+  const bounds = leafletMap.getBounds()
+  const bbox: [number, number, number, number] = [
+    bounds.getSouth(),
+    bounds.getWest(),
+    bounds.getNorth(),
+    bounds.getEast(),
+  ]
+
+  selectedBbox.value = bbox
+  selectedZoomLevel.value = mapStore.zoom
+  showCreateResearchAreaDialog.value = true
+}
 
 const {
   videos,
@@ -54,6 +78,41 @@ const { searchQuery } = useYoutubeSearchSettings()
 
 const mapRef = ref<InstanceType<typeof LMap> | null>(null)
 const mapReady = ref(false)
+
+// Watch for bbox restriction changes
+watch(
+  () => mapStore.bboxRestriction,
+  (bbox) => {
+    const leafletMap = mapRef.value?.leafletObject
+    if (!leafletMap) return
+
+    if (bbox) {
+      // Apply max bounds restriction
+      leafletMap.setMaxBounds([
+        [bbox[0], bbox[1]],
+        [bbox[2], bbox[3]],
+      ])
+    }
+    // Note: Leaflet doesn't have a removeMaxBounds method, so we just don't call setMaxBounds when bbox is null
+  },
+)
+
+// Watch for minZoom restriction changes
+watch(
+  () => mapStore.minZoom,
+  (minZoom) => {
+    const leafletMap = mapRef.value?.leafletObject
+    if (!leafletMap) return
+
+    if (minZoom !== null) {
+      // Apply min zoom restriction
+      leafletMap.setMinZoom(minZoom)
+    } else {
+      // Clear min zoom restriction by setting it to 0 (Leaflet default)
+      leafletMap.setMinZoom(0)
+    }
+  },
+)
 
 const videoMarkerList = computed<VideoMarker[]>(() => {
   const favoriteIds = new Set(favorites.value.map((video) => video.videoId))
@@ -114,21 +173,22 @@ const videoClusterOptions = {
 //   },
 // }
 
-const fetchVideos = async () => {
-  await fetchYoutubeVideos({
-    apiKey,
-    currentMapPosition: mapStore.center,
-    currentZoom: mapStore.zoom,
-    searchQuery: searchQuery.value.value,
-    category: searchQuery.value.name,
-  })
-
-  setShowSearchButton(false)
-
-  if (!isMobile.value) {
-    setSelectedOption('search', true)
-  }
-}
+// Temporarily disabled - fetchVideos not used currently
+// const fetchVideos = async () => {
+//   await fetchYoutubeVideos({
+//     apiKey,
+//     currentMapPosition: mapStore.center,
+//     currentZoom: mapStore.zoom,
+//     searchQuery: searchQuery.value.value,
+//     category: searchQuery.value.name,
+//   })
+//
+//   setShowSearchButton(false)
+//
+//   if (!isMobile.value) {
+//     setSelectedOption('search', true)
+//   }
+// }
 
 // Temporarily disabled POI search
 // const getCurrentBbox = (): OverpassBbox | null => {
@@ -266,11 +326,12 @@ const handleOnboardingComplete = async () => {
     setSearchQueryByValue(selectedOption.value)
   }
 
-  await fetchVideos()
+  // Don't fetch automatically - user should select a research area first
 }
 
 onMounted(async () => {
   searchPreferences.loadOnboardingStatus()
+  researchAreaStore.loadFromStorage()
 
   initializeLeaflet()
   await fetchFavorites()
@@ -287,10 +348,8 @@ onMounted(async () => {
     mapReady.value = true
   }
 
-  // Only fetch videos automatically if onboarding was completed
-  if (searchPreferences.hasCompletedOnboarding) {
-    await fetchVideos()
-  } else {
+  // Only show onboarding if not completed, don't fetch automatically
+  if (!searchPreferences.hasCompletedOnboarding) {
     showOnboarding.value = true
   }
 })
@@ -399,7 +458,15 @@ onMounted(async () => {
 
     <div class="absolute left-1/2 top-24 z-9999 flex -translate-x-1/2 transform gap-2">
       <Button
-        v-if="showSearchButton"
+        v-if="!researchAreaStore.activeResearchAreaId && searchPreferences.hasCompletedOnboarding"
+        variant="secondary"
+        class="border bg-background text-sm text-primary hover:bg-secondary"
+        @click="handleSelectArea"
+      >
+        Select this area
+      </Button>
+      <Button
+        v-if="showSearchButton && researchAreaStore.activeResearchAreaId"
         variant="secondary"
         class="border bg-background text-sm text-primary hover:bg-secondary"
         @click="researchInArea"
@@ -420,6 +487,14 @@ onMounted(async () => {
     </div>
 
     <OnboardingDialog :open="showOnboarding" @complete="handleOnboardingComplete" />
+
+    <CreateResearchAreaDialog
+      v-if="selectedBbox"
+      :open="showCreateResearchAreaDialog"
+      :bbox="selectedBbox"
+      :zoomLevel="selectedZoomLevel"
+      @close="showCreateResearchAreaDialog = false"
+    />
   </div>
 </template>
 

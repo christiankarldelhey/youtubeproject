@@ -12,4 +12,6 @@ export type MapStoreState = {
   zoom: Zoom
   center: Center
   flyToTarget: { center: Center; zoom?: Zoom; bbox?: Bbox } | null
+  bboxRestriction: Bbox
+  minZoom: number | null
 }

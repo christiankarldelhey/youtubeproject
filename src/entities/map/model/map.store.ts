@@ -6,6 +6,8 @@ export const useMapStore = defineStore('map', {
     zoom: 2,
     center: [47.41322, -1.219482] as [number, number],
     flyToTarget: null as { center: Center; zoom?: Zoom; bbox?: Bbox } | null,
+    bboxRestriction: null as Bbox,
+    minZoom: null as number | null,
   }) as MapStoreState,
   actions: {
     setZoom(newZoom: Zoom): void {
@@ -19,6 +21,18 @@ export const useMapStore = defineStore('map', {
     },
     clearFlyToTarget() {
       this.flyToTarget = null
+    },
+    setBboxRestriction(bbox: Bbox): void {
+      this.bboxRestriction = bbox
+    },
+    clearBboxRestriction(): void {
+      this.bboxRestriction = null
+    },
+    setMinZoom(minZoom: number | null): void {
+      this.minZoom = minZoom
+    },
+    clearMinZoom(): void {
+      this.minZoom = null
     },
   },
 })

@@ -3,6 +3,13 @@ import express from 'express';
 import { env } from './config/env.js';
 import { checkDbConnection, pool } from './db/pool.js';
 import { searchVideos } from './services/youtube-ingestion.service.js';
+import {
+  createResearchArea,
+  listResearchAreas,
+  getResearchAreaById,
+  updateResearchArea,
+  deleteResearchArea,
+} from './db/repositories/research-areas.repository.js';
 
 const app = express();
 
@@ -52,6 +59,113 @@ app.post('/api/videos/search', async (req, res) => {
   } catch (error) {
     return res.status(502).json({
       error: 'Failed to search videos',
+      details: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+// Research Areas endpoints
+app.post('/api/research-areas', async (req, res) => {
+  try {
+    const { name, bbox, zoomLevel, travelType, category } = req.body;
+
+    if (!name || !bbox) {
+      return res.status(400).json({
+        error: 'Missing required fields: name, bbox',
+      });
+    }
+
+    const researchArea = await createResearchArea({
+      name,
+      bbox,
+      zoomLevel,
+      travelType,
+      category,
+    });
+
+    return res.status(201).json(researchArea);
+  } catch (error) {
+    return res.status(500).json({
+      error: 'Failed to create research area',
+      details: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+app.get('/api/research-areas', async (_req, res) => {
+  try {
+    const researchAreas = await listResearchAreas();
+    return res.status(200).json(researchAreas);
+  } catch (error) {
+    return res.status(500).json({
+      error: 'Failed to list research areas',
+      details: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+app.get('/api/research-areas/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const researchArea = await getResearchAreaById(id);
+
+    if (!researchArea) {
+      return res.status(404).json({
+        error: 'Research area not found',
+      });
+    }
+
+    return res.status(200).json(researchArea);
+  } catch (error) {
+    return res.status(500).json({
+      error: 'Failed to get research area',
+      details: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+app.put('/api/research-areas/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, active, videos, pois } = req.body;
+
+    const researchArea = await updateResearchArea(id, {
+      name,
+      active,
+      videos,
+      pois,
+    });
+
+    if (!researchArea) {
+      return res.status(404).json({
+        error: 'Research area not found',
+      });
+    }
+
+    return res.status(200).json(researchArea);
+  } catch (error) {
+    return res.status(500).json({
+      error: 'Failed to update research area',
+      details: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
+});
+
+app.delete('/api/research-areas/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await deleteResearchArea(id);
+
+    if (!deleted) {
+      return res.status(404).json({
+        error: 'Research area not found',
+      });
+    }
+
+    return res.status(204).send();
+  } catch (error) {
+    return res.status(500).json({
+      error: 'Failed to delete research area',
       details: error instanceof Error ? error.message : 'Unknown error',
     });
   }
