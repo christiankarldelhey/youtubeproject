@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS travel_videos (
   published_at TIMESTAMPTZ,
   thumbnail TEXT,
   research_area TEXT,
+  zoom_levels INTEGER[],
   geom GEOMETRY(Point, 4326),
   fetched_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

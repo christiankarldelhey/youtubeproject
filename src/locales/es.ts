@@ -1,20 +1,20 @@
 export default {
     search_placeholder: "Buscar una ubicación...",
-  
+
     videos_in_area: "Videos en esta área",
     research_in_area: "Research in this area",
     poi_unknown_name: "POI desconocido",
     poi_unknown_description: "Sin descripción disponible",
-  
+
     login_title: "Iniciar sesión",
     sign_up_title: "Registrarse",
     email_placeholder: "Ingresa tu correo electrónico",
     email_invalid: "Por favor, ingresa una dirección de correo válida.",
     send_login_link: "Enviar enlace de inicio de sesión",
     login_link_sent: "¡Enlace de inicio de sesión enviado! Revisa tu correo.",
-  
+
     favorited_videos: "Videos favoritos",
-  
+
     search_by_topic: "Buscar por tema",
     save_settings: "Guardar configuración",
     language: "Idioma",
@@ -37,6 +37,14 @@ export default {
       removed_from_favorites_title: "Eliminar de favoritos",
       added_to_favorites_description: "{label} se agrego a favoritos.",
       removed_from_favorites_description: "{label} se elimino de favoritos.",
-    }
+    },
+    onboarding_title: "Bienvenido",
+    onboarding_step1_title: "¿Adónde quieres viajar?",
+    onboarding_city: "Ciudad",
+    onboarding_rural: "Rural",
+    onboarding_explore: "No sé, voy a explorar",
+    onboarding_step2_title: "¿Qué actividades te interesan?",
+    onboarding_continue: "Continuar",
+    onboarding_start: "Comenzar a explorar",
   };
   

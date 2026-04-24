@@ -38,5 +38,13 @@ export default {
     removed_from_favorites_title: "Removed from favorites",
     added_to_favorites_description: "{label} was added to your favorites.",
     removed_from_favorites_description: "{label} was removed from your favorites.",
-  }
+  },
+  onboarding_title: "Welcome",
+  onboarding_step1_title: "Where do you want to travel?",
+  onboarding_city: "City",
+  onboarding_rural: "Rural",
+  onboarding_explore: "Not sure, I'll explore",
+  onboarding_step2_title: "What activities are you interested in?",
+  onboarding_continue: "Continue",
+  onboarding_start: "Start exploring",
 };

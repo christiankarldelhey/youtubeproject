@@ -25,10 +25,13 @@ import type { VideoMarker } from '@/entities/youtube-video'
 import { useYoutubeVideos } from '@/features/youtube-videos'
 import { useYoutubeFavorites } from '@/features/youtube-favorites'
 import { useYoutubeSearchSettings } from '@/features/youtube-search-settings'
+import { useSearchPreferencesStore } from '@/shared/model/search-preferences.store'
+import { OnboardingDialog } from '@/features/onboarding'
 
 const { isMobile } = useMobile()
 const mapStore = useMapStore()
 const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY
+const searchPreferences = useSearchPreferencesStore()
 
 const {
   videos,
@@ -248,7 +251,27 @@ watch(
   },
 )
 
+const showOnboarding = ref(false)
+
+const handleOnboardingComplete = async () => {
+  showOnboarding.value = false
+
+  // Set the search query based on the selected category from onboarding
+  const { setSearchQueryByValue } = useYoutubeSearchSettings()
+  const { searchOptions } = useYoutubeSearchSettings()
+
+  // Find the search option that matches the category name
+  const selectedOption = searchOptions.find((opt) => opt.name === searchPreferences.category)
+  if (selectedOption) {
+    setSearchQueryByValue(selectedOption.value)
+  }
+
+  await fetchVideos()
+}
+
 onMounted(async () => {
+  searchPreferences.loadOnboardingStatus()
+
   initializeLeaflet()
   await fetchFavorites()
   // Temporarily disabled POI search
@@ -264,7 +287,12 @@ onMounted(async () => {
     mapReady.value = true
   }
 
-  await fetchVideos()
+  // Only fetch videos automatically if onboarding was completed
+  if (searchPreferences.hasCompletedOnboarding) {
+    await fetchVideos()
+  } else {
+    showOnboarding.value = true
+  }
 })
 </script>
 
@@ -278,7 +306,7 @@ onMounted(async () => {
       @moveend="moveMapCenter"
       @ready="onMapReady"
     >
-      <l-tile-layer :url="mapsList.carto" layer-type="base" name="map" />
+      <l-tile-layer :url="mapsList.voyager" layer-type="base" name="map" />
 
       <!-- Temporarily disabled POI search -->
       <!-- <l-marker-cluster-group -->
@@ -390,6 +418,8 @@ onMounted(async () => {
         <Spinner class="mt-2" />
       </div>
     </div>
+
+    <OnboardingDialog :open="showOnboarding" @complete="handleOnboardingComplete" />
   </div>
 </template>
 
