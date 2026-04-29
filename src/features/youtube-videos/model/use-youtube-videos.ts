@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import axios from 'axios'
 import { fetchVideosFromBackend } from '@/entities/youtube-video'
 import type { FetchYoutubeParams, VideoMarker } from '@/entities/youtube-video'
+import { getVideosInH3Cell, h3GetResolution } from '@/shared/composables/use-h3-hexagons'
 
 type SidebarSelection = 'search' | 'favorites'
 
@@ -21,6 +22,7 @@ const selectedOption = ref<SelectedOption>({
   value: 'search',
   expanded: false,
 })
+const filteredVideos = ref<VideoMarker[]>([])
 
 export function useYoutubeVideos() {
   const fetchYoutubeVideos = async (
@@ -77,6 +79,15 @@ export function useYoutubeVideos() {
     selectedVideo.value = null
   }
 
+  const filterVideosByH3 = (h3Index: string) => {
+    const resolution = h3GetResolution(h3Index)
+    filteredVideos.value = getVideosInH3Cell(videos.value, h3Index, resolution)
+  }
+
+  const clearVideoFilter = () => {
+    filteredVideos.value = []
+  }
+
   return {
     videos,
     loading,
@@ -86,6 +97,7 @@ export function useYoutubeVideos() {
     mobileVideoDetail,
     showSearchButton,
     selectedOption,
+    filteredVideos,
     fetchYoutubeVideos,
     setVideos,
     setShowSearchButton,
@@ -94,5 +106,7 @@ export function useYoutubeVideos() {
     setMobileVideoDetail,
     selectVideo,
     clearSelectedVideo,
+    filterVideosByH3,
+    clearVideoFilter,
   }
 }

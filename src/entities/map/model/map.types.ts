@@ -14,4 +14,5 @@ export type MapStoreState = {
   flyToTarget: { center: Center; zoom?: Zoom; bbox?: Bbox } | null
   bboxRestriction: Bbox
   minZoom: number | null
+  selectedH3Index: string | null
 }

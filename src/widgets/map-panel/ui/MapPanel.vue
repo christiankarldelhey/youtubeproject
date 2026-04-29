@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import L from 'leaflet'
-import { LMap, LMarker, LPopup, LTileLayer } from '@vue-leaflet/vue-leaflet'
-import { LMarkerClusterGroup } from 'vue-leaflet-markercluster'
+import { LMap, LMarker, LPopup, LTileLayer, LPolygon } from '@vue-leaflet/vue-leaflet'
 import { computed, onMounted, ref, watch } from 'vue'
-import 'leaflet.markercluster'
 import { Spinner } from '@/shared/ui/spinner'
 import { Button } from '@/shared/ui/shadcn/button'
 import { MapPin } from 'lucide-vue-next'
@@ -14,7 +12,7 @@ import {
   getUserLocation,
   mapsList,
   heartIcon,
-  videoIcon,
+  defaultIcon,
 } from '@/entities/map'
 // Temporarily disabled POI search
 // import { getPoiTopicEmoji, getPoiTopicIcon } from '@/entities/poi'
@@ -29,6 +27,12 @@ import { useSearchPreferencesStore } from '@/shared/model/search-preferences.sto
 import { OnboardingDialog } from '@/features/onboarding'
 import { CreateResearchAreaDialog } from '@/features/research-area'
 import { useResearchAreaStore } from '@/entities/research-area'
+import {
+  getH3ResolutionForZoom,
+  h3ToPolygon,
+  generateHexagonsForVideos,
+  getDensityColor,
+} from '@/shared/composables/use-h3-hexagons'
 
 const { isMobile } = useMobile()
 const mapStore = useMapStore()
@@ -69,6 +73,8 @@ const {
   selectVideo,
   setDialogOpen,
   setMobileVideoDetail,
+  filterVideosByH3,
+  clearVideoFilter,
 } = useYoutubeVideos()
 // Temporarily disabled POI search
 // const { pois, loadingPois, poisError, fetchPoisByCurrentViewport, clearPois } = useSeePois()
@@ -143,18 +149,42 @@ const visibleError = computed(() => error.value)
 // const mapLoading = computed(() => loading.value || loadingPois.value)
 const mapLoading = computed(() => loading.value)
 
-const videoClusterOptions = {
-  clusterPane: 'videoClustersPane',
-  iconCreateFunction: (cluster: { getChildCount: () => number }) => {
-    const count = cluster.getChildCount()
+// Hexagon data
+const currentH3Resolution = computed(() => getH3ResolutionForZoom(mapStore.zoom))
 
-    return L.divIcon({
-      html: `<div style="display:flex;align-items:center;justify-content:center;gap:4px;width:48px;height:48px;border-radius:9999px;background:#ef4444;border:2px solid #ffffff;color:#ffffff;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.35);"><span style="font-size:14px;line-height:1">▶</span><span style="font-size:12px;line-height:1">${count}</span></div>`,
-      className: 'custom-cluster-icon',
-      iconSize: [48, 48],
-      iconAnchor: [24, 24],
-    })
-  },
+const hexagonData = computed(() => {
+  if (mapStore.zoom < 5) return [] // Only show hexagons at zoom level 5+
+  
+  const hexagons = generateHexagonsForVideos(videoMarkerList.value, currentH3Resolution.value)
+  const maxCount = Math.max(...Array.from(hexagons.values()).map((v) => v.length), 1)
+  
+  return Array.from(hexagons.entries()).map(([h3Index, videosInHex]) => {
+    const polygon = h3ToPolygon(h3Index)
+    const count = videosInHex.length
+    const color = getDensityColor(count, maxCount)
+    const isSelected = mapStore.selectedH3Index === h3Index
+    
+    return {
+      h3Index,
+      polygon,
+      count,
+      color,
+      isSelected,
+    }
+  })
+})
+
+const handleHexagonClick = (h3Index: string) => {
+  if (mapStore.selectedH3Index === h3Index) {
+    // Deselect if clicking the same hexagon
+    mapStore.clearSelectedH3Index()
+    clearVideoFilter()
+  } else {
+    // Select the hexagon
+    mapStore.setSelectedH3Index(h3Index)
+    filterVideosByH3(h3Index)
+    setSelectedOption('search', true)
+  }
 }
 
 // Temporarily disabled POI search
@@ -172,6 +202,18 @@ const videoClusterOptions = {
 //     })
 //   },
 // }
+
+// Watch for zoom changes to clear hexagon selection when zooming significantly
+watch(
+  () => mapStore.zoom,
+  (newZoom, oldZoom) => {
+    // Clear selection if zoom level changes by more than 1
+    if (oldZoom && Math.abs(newZoom - oldZoom) > 1) {
+      mapStore.clearSelectedH3Index()
+      clearVideoFilter()
+    }
+  },
+)
 
 // Temporarily disabled - fetchVideos not used currently
 // const fetchVideos = async () => {
@@ -277,7 +319,7 @@ const selectMarker = (video: VideoMarker) => {
 }
 
 const getMarkerIcon = (video: VideoMarker): L.Icon<L.IconOptions> => {
-  return (video.favorited ? heartIcon : videoIcon) as unknown as L.Icon<L.IconOptions>
+  return (video.favorited ? heartIcon : defaultIcon) as unknown as L.Icon<L.IconOptions>
 }
 
 // Temporarily disabled POI search
@@ -410,50 +452,59 @@ onMounted(async () => {
       <!--   </template> -->
       <!-- </l-marker-cluster-group> -->
 
-      <l-marker-cluster-group
-        :options="videoClusterOptions"
-        :key="videoMarkerList.length + JSON.stringify(videoMarkerList.map((item) => item.videoId))"
-      >
-        <template v-if="isMobile">
-          <l-marker
-            v-for="marker in videoMarkerList"
-            :key="marker.videoId"
-            :lat-lng="marker.position ?? mapStore.center"
-            :icon="getMarkerIcon(marker)"
-            :options="{ pane: 'videoMarkersPane' }"
-          >
-            <l-popup class="relative z-100001 cursor-pointer" @click="selectMarker(marker)">
-              <span class="z-9999 mb-2 flex flex-row text-primary">
-                <MapPin class="z-10001 mr-1 h-4 w-4" /> {{ marker.location?.toUpperCase() }}
-              </span>
-              <div class="relative h-36 w-64 overflow-hidden rounded">
-                <img :src="marker.thumbnail" alt="Video Thumbnail" class="h-full w-full object-cover" />
-              </div>
-              <p>{{ marker.title }}</p>
-            </l-popup>
-          </l-marker>
-        </template>
+      <!-- Hexagon heatmap layer -->
+      <l-polygon
+        v-for="hex in hexagonData"
+        :key="hex.h3Index"
+        :lat-lngs="hex.polygon"
+        :color="hex.isSelected ? '#ffffff' : hex.color"
+        :fill-color="hex.color"
+        :fill-opacity="hex.isSelected ? 0.8 : 0.5"
+        :weight="hex.isSelected ? 3 : 1"
+        :options="{ pane: 'videoClustersPane' }"
+        @click="handleHexagonClick(hex.h3Index)"
+      />
 
-        <template v-else>
-          <l-marker
-            v-for="marker in videoMarkerList"
-            :key="marker.videoId"
-            :lat-lng="marker.position ?? mapStore.center"
-            :icon="getMarkerIcon(marker)"
-            :options="{ pane: 'videoMarkersPane' }"
-          >
-            <l-popup class="relative z-100001 cursor-pointer" @click="selectMarker(marker)">
-              <span class="z-9999 mb-2 flex flex-row text-primary">
-                <MapPin class="z-10001 mr-1 h-4 w-4" /> {{ marker.location?.toUpperCase() }}
-              </span>
-              <div class="relative h-36 w-64 overflow-hidden rounded">
-                <img :src="marker.thumbnail" alt="Video Thumbnail" class="h-full w-full object-cover" />
-              </div>
-              <p>{{ marker.title }}</p>
-            </l-popup>
-          </l-marker>
-        </template>
-      </l-marker-cluster-group>
+      <!-- Individual video markers (no clustering) - only show when hexagon is selected -->
+      <template v-if="mapStore.selectedH3Index && isMobile">
+        <l-marker
+          v-for="marker in videoMarkerList"
+          :key="marker.videoId"
+          :lat-lng="marker.position ?? mapStore.center"
+          :icon="getMarkerIcon(marker)"
+          :options="{ pane: 'videoMarkersPane' }"
+        >
+          <l-popup class="relative z-100001 cursor-pointer" @click="selectMarker(marker)">
+            <span class="z-9999 mb-2 flex flex-row text-primary">
+              <MapPin class="z-10001 mr-1 h-4 w-4" /> {{ marker.location?.toUpperCase() }}
+            </span>
+            <div class="relative h-36 w-64 overflow-hidden rounded">
+              <img :src="marker.thumbnail" alt="Video Thumbnail" class="h-full w-full object-cover" />
+            </div>
+            <p>{{ marker.title }}</p>
+          </l-popup>
+        </l-marker>
+      </template>
+
+      <template v-else-if="mapStore.selectedH3Index">
+        <l-marker
+          v-for="marker in videoMarkerList"
+          :key="marker.videoId"
+          :lat-lng="marker.position ?? mapStore.center"
+          :icon="getMarkerIcon(marker)"
+          :options="{ pane: 'videoMarkersPane' }"
+        >
+          <l-popup class="relative z-100001 cursor-pointer" @click="selectMarker(marker)">
+            <span class="z-9999 mb-2 flex flex-row text-primary">
+              <MapPin class="z-10001 mr-1 h-4 w-4" /> {{ marker.location?.toUpperCase() }}
+            </span>
+            <div class="relative h-36 w-64 overflow-hidden rounded">
+              <img :src="marker.thumbnail" alt="Video Thumbnail" class="h-full w-full object-cover" />
+            </div>
+            <p>{{ marker.title }}</p>
+          </l-popup>
+        </l-marker>
+      </template>
     </l-map>
 
     <div class="absolute left-1/2 top-24 z-9999 flex -translate-x-1/2 transform gap-2">
@@ -507,10 +558,5 @@ onMounted(async () => {
 
 :deep(.leaflet-pane.leaflet-popup-pane) {
   z-index: 100000 !important;
-}
-
-:deep(.custom-cluster-icon) {
-  background: transparent;
-  border: none;
 }
 </style>

@@ -8,6 +8,7 @@ export const useMapStore = defineStore('map', {
     flyToTarget: null as { center: Center; zoom?: Zoom; bbox?: Bbox } | null,
     bboxRestriction: null as Bbox,
     minZoom: null as number | null,
+    selectedH3Index: null as string | null,
   }) as MapStoreState,
   actions: {
     setZoom(newZoom: Zoom): void {
@@ -33,6 +34,12 @@ export const useMapStore = defineStore('map', {
     },
     clearMinZoom(): void {
       this.minZoom = null
+    },
+    setSelectedH3Index(index: string | null): void {
+      this.selectedH3Index = index
+    },
+    clearSelectedH3Index(): void {
+      this.selectedH3Index = null
     },
   },
 })

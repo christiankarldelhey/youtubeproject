@@ -18,6 +18,7 @@ const {
   mobileVideoDetail,
   selectedOption,
   setSelectedOption,
+  filteredVideos,
 } = useYoutubeVideos()
 const { favorites } = useYoutubeFavorites()
 const { isMobile } = useMobile()
@@ -29,7 +30,7 @@ const { isMobile } = useMobile()
     :defaultOpen="false"
     style="--sidebar-width: 35rem;"
   >
-    <VideoSidebar :favorites="favorites" :videos="videos" />
+    <VideoSidebar :favorites="favorites" :videos="videos" :filtered-videos="filteredVideos" />
 
     <UserControls :user="user" class="z-9999" />
     <SearchBar />
@@ -46,6 +47,7 @@ const { isMobile } = useMobile()
       :open="selectedOption.expanded"
       :favorites="favorites"
       :videos="videos"
+      :filtered-videos="filteredVideos"
       @update:open="setSelectedOption(selectedOption.value, false)"
     />
 

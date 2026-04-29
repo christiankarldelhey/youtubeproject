@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { HeartIcon, List, XIcon } from 'lucide-vue-next'
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 import {
   Sidebar,
   SidebarContent,
@@ -20,11 +20,23 @@ import VideoList from './VideoList.vue'
 const props = defineProps<{
   videos: VideoMarker[]
   favorites: VideoMarker[]
+  filteredVideos?: VideoMarker[]
 }>()
 
 const { state } = useSidebar()
 const { iconMap, searchQuery } = useYoutubeSearchSettings()
 const { selectedOption, setSelectedOption } = useYoutubeVideos()
+
+const displayVideos = computed(() => {
+  if (props.filteredVideos && props.filteredVideos.length > 0) {
+    return props.filteredVideos
+  }
+  return props.videos
+})
+
+const isFiltered = computed(() => {
+  return props.filteredVideos && props.filteredVideos.length > 0
+})
 
 watch(
   () => props.videos,
@@ -77,17 +89,22 @@ watch(
 
         <div v-if="state === 'expanded'" class="h-screen flex-1 overflow-y-auto bg-background">
           <div class="sticky top-0 z-10 flex cursor-pointer flex-row justify-between border-b bg-background p-4 text-primary shadow-sm">
-            <span v-if="selectedOption.value === 'search'" class="flex flex-row items-center gap-2 font-semibold text-primary">
-              <component :is="iconMap[searchQuery.icon as keyof typeof iconMap]" class="h-4 w-4" />
-              {{ $t('sidebar.search_results', { label: (searchQuery.value as any).name }) }}
-            </span>
-            <span v-if="selectedOption.value === 'favorites'" class="flex flex-row items-center gap-2 font-semibold text-primary">
-              <HeartIcon class="h-4 w-4" /> {{ $t('sidebar.favorites') }}
-            </span>
+            <div class="flex flex-col gap-1">
+              <span v-if="selectedOption.value === 'search'" class="flex flex-row items-center gap-2 font-semibold text-primary">
+                <component :is="iconMap[searchQuery.icon as keyof typeof iconMap]" class="h-4 w-4" />
+                {{ $t('sidebar.search_results', { label: (searchQuery.value as any).name }) }}
+              </span>
+              <span v-if="selectedOption.value === 'favorites'" class="flex flex-row items-center gap-2 font-semibold text-primary">
+                <HeartIcon class="h-4 w-4" /> {{ $t('sidebar.favorites') }}
+              </span>
+              <span v-if="isFiltered && selectedOption.value === 'search'" class="text-xs text-gray-500">
+                Showing {{ displayVideos.length }} videos in selected region
+              </span>
+            </div>
             <XIcon class="h-6 w-6" @click="setSelectedOption(selectedOption.value, false)" />
           </div>
 
-          <VideoList v-if="selectedOption.value === 'search'" :videos="props.videos" />
+          <VideoList v-if="selectedOption.value === 'search'" :videos="displayVideos" />
           <VideoList v-if="selectedOption.value === 'favorites'" :videos="props.favorites" />
         </div>
       </SidebarContent>
