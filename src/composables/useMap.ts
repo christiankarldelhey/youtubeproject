@@ -4,15 +4,21 @@ import "leaflet/dist/leaflet.css";
 export function useMap() {
     window.L = L;
 
+    const cartoKey = import.meta.env.VITE_CARTO_API_KEY
+        ? `?key=${import.meta.env.VITE_CARTO_API_KEY}`
+        : '';
+    const carto = (style: string) =>
+        `https://{s}.basemaps.cartocdn.com/${style}/{z}/{x}/{y}{r}.png${cartoKey}`;
+
     const mapsList = {
         stadia: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
-        carto: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-        cartoLight: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-        cartoDark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+        carto: carto('light_all'),
+        cartoLight: carto('light_all'),
+        cartoDark: carto('dark_all'),
         openstreetmap: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         esri: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         wikimedia: "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png",
-        voyager: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        voyager: carto('rastertiles/voyager'),
         watercolor: "https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}{r}.jpg",
         stadia2: "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png",
         stamenToner: 'https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png',

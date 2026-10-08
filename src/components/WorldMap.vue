@@ -180,6 +180,7 @@ onMounted(async () => {
       :url="mapsList.carto"
       layer-type="base"
       name="map"
+      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
     />
     
     <l-marker-cluster-group 
