@@ -67,6 +67,7 @@ const {
   error,
   showSearchButton,
   selectedOption,
+  filteredVideos,
   fetchYoutubeVideos,
   setShowSearchButton,
   setSelectedOption,
@@ -132,6 +133,14 @@ const videoMarkerList = computed<VideoMarker[]>(() => {
   }
 
   return videosWithFavoriteState
+})
+
+const filteredVideoMarkers = computed<VideoMarker[]>(() => {
+  const favoriteIds = new Set(favorites.value.map((video) => video.videoId))
+  return filteredVideos.value.map((video) => ({
+    ...video,
+    favorited: favoriteIds.has(video.videoId),
+  }))
 })
 
 // Temporarily disabled POI search
@@ -295,11 +304,11 @@ const onMapReady = () => {
   const poiClustersPane = map.createPane('poiClustersPane')
   poiClustersPane.style.zIndex = '560'
 
-  const videoMarkersPane = map.createPane('videoMarkersPane')
-  videoMarkersPane.style.zIndex = '620'
-
   const videoClustersPane = map.createPane('videoClustersPane')
-  videoClustersPane.style.zIndex = '660'
+  videoClustersPane.style.zIndex = '600'
+
+  const videoMarkersPane = map.createPane('videoMarkersPane')
+  videoMarkersPane.style.zIndex = '660'
 
   if (!isMobile.value) {
     map.zoomControl.setPosition('bottomright')
@@ -405,6 +414,7 @@ onMounted(async () => {
       v-model:zoom="mapStore.zoom"
       :center="mapStore.center"
       @moveend="moveMapCenter"
+      @zoomend="moveMapCenter"
       @ready="onMapReady"
     >
       <l-tile-layer :url="mapsList.voyager" layer-type="base" name="map" />
@@ -461,18 +471,22 @@ onMounted(async () => {
         :fill-color="hex.color"
         :fill-opacity="hex.isSelected ? 0.8 : 0.5"
         :weight="hex.isSelected ? 3 : 1"
-        :options="{ pane: 'videoClustersPane' }"
+        :options="{
+          pane: 'videoClustersPane',
+          interactive: !mapStore.selectedH3Index,
+          bubblingMouseEvents: false,
+        }"
         @click="handleHexagonClick(hex.h3Index)"
       />
 
       <!-- Individual video markers (no clustering) - only show when hexagon is selected -->
       <template v-if="mapStore.selectedH3Index && isMobile">
         <l-marker
-          v-for="marker in videoMarkerList"
+          v-for="marker in filteredVideoMarkers"
           :key="marker.videoId"
           :lat-lng="marker.position ?? mapStore.center"
           :icon="getMarkerIcon(marker)"
-          :options="{ pane: 'videoMarkersPane' }"
+          :options="{ pane: 'videoMarkersPane', bubblingMouseEvents: false }"
         >
           <l-popup class="relative z-100001 cursor-pointer" @click="selectMarker(marker)">
             <span class="z-9999 mb-2 flex flex-row text-primary">
@@ -488,11 +502,11 @@ onMounted(async () => {
 
       <template v-else-if="mapStore.selectedH3Index">
         <l-marker
-          v-for="marker in videoMarkerList"
+          v-for="marker in filteredVideoMarkers"
           :key="marker.videoId"
           :lat-lng="marker.position ?? mapStore.center"
           :icon="getMarkerIcon(marker)"
-          :options="{ pane: 'videoMarkersPane' }"
+          :options="{ pane: 'videoMarkersPane', bubblingMouseEvents: false }"
         >
           <l-popup class="relative z-100001 cursor-pointer" @click="selectMarker(marker)">
             <span class="z-9999 mb-2 flex flex-row text-primary">

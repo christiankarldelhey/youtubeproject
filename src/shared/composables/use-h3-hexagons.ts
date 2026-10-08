@@ -4,14 +4,18 @@ import type { VideoMarker } from '@/entities/youtube-video'
 
 /**
  * Get H3 resolution based on map zoom level
- * Zoom 2-4: resolution 5 (~10km hexagons) - continental/country level
- * Zoom 5-7: resolution 7 (~1km hexagons) - regional/city level
- * Zoom 8+: resolution 9 (~100m hexagons) - neighborhood level
+ * Granular mapping aligned with H3 cell sizes
  */
 export function getH3ResolutionForZoom(zoom: number): number {
-  if (zoom <= 4) return 5
-  if (zoom <= 7) return 7
-  return 9
+  if (zoom <= 2) return 1  // ~2,000,000 km² - global
+  if (zoom <= 3) return 2  // ~86,000 km²   - continental
+  if (zoom <= 4) return 3  // ~12,000 km²   - country
+  if (zoom <= 5) return 4  // ~1,700 km²    - region
+  if (zoom <= 6) return 5  // ~250 km²      - large city
+  if (zoom <= 8) return 6  // ~36 km²       - city
+  if (zoom <= 10) return 7 // ~5 km²        - neighborhood
+  if (zoom <= 12) return 8 // ~0.7 km²      - block
+  return 9                 // ~0.1 km²      - detail
 }
 
 /**
@@ -129,4 +133,51 @@ export function getVisibleH3Cells(
   ], resolution)
   
   return cells
+}
+
+/**
+ * Get children of an H3 cell at the next finer resolution
+ */
+export function getH3Children(h3Index: string): string[] {
+  const currentResolution = h3GetResolution(h3Index)
+  return h3.cellToChildren(h3Index, currentResolution + 1)
+}
+
+/**
+ * Get parent of an H3 cell at the next coarser resolution
+ */
+export function getH3Parent(h3Index: string): string {
+  const currentResolution = h3GetResolution(h3Index)
+  return h3.cellToParent(h3Index, currentResolution - 1)
+}
+
+/**
+ * Generate child hexagons for a specific parent H3 cell
+ */
+export function generateChildHexagons(
+  videos: VideoMarker[],
+  parentH3Index: string,
+  childResolution: number
+): Map<string, VideoMarker[]> {
+  const hexagonMap = new Map<string, VideoMarker[]>()
+  
+  // Get all child cells of the parent
+  const childCells = getH3Children(parentH3Index)
+  
+  videos.forEach((video) => {
+    if (!video.position) return
+    
+    const videoH3 = latLngToH3(video.position[0], video.position[1], childResolution)
+    
+    // Only include if the video is in one of the child cells
+    if (childCells.includes(videoH3)) {
+      if (!hexagonMap.has(videoH3)) {
+        hexagonMap.set(videoH3, [])
+      }
+      
+      hexagonMap.get(videoH3)!.push(video)
+    }
+  })
+  
+  return hexagonMap
 }
